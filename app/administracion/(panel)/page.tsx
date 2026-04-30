@@ -1,70 +1,141 @@
 import {
   AlertTriangle,
-  BarChart3,
   CalendarDays,
+  ClipboardCheck,
   ShieldCheck,
   Users,
+  Wrench,
 } from 'lucide-react'
 import { getAdminSession } from '@/lib/admin-auth/server'
+import { adminGet, type ApiOk } from '@/lib/admin-api'
+import { StatCard } from '@/components/ui/stat-card'
 
-const cards = [
-  { label: 'Usuarios', value: 'Pendiente API', icon: Users, color: 'text-brand-600 bg-brand-50' },
-  { label: 'Reservas', value: 'Pendiente API', icon: CalendarDays, color: 'text-warning-500 bg-warning-50' },
-  { label: 'Verificaciones', value: 'Pendiente API', icon: ShieldCheck, color: 'text-success-500 bg-success-50' },
-  { label: 'Reportes', value: 'Pendiente API', icon: BarChart3, color: 'text-brand-700 bg-brand-100' },
-]
+type DashboardStats = {
+  usuarios: { total: number; activos: number; admins: number; clientes: number; tecnicos: number }
+  reservas: { total: number; pendientes: number; activas: number; completadas: number; canceladas: number }
+  servicios: { total: number; activos: number; categorias: number }
+  disputas: { abiertas: number; total: number }
+  verificaciones: { pendientes: number }
+  auditoria: { total: number }
+}
 
 export default async function AdministracionPage() {
   const admin = await getAdminSession()
 
+  let stats: DashboardStats | null = null
+  try {
+    const res = await adminGet<ApiOk<DashboardStats>>('/api/admin/dashboard/stats')
+    stats = res.datos
+  } catch {
+    // stats stays null — show fallback
+  }
+
   return (
-    <div className="animate-fade-in">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-surface-900">
+    <div>
+      {/* Section header */}
+      <div className="mb-10">
+        <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#EE7070]">
+          Panel de control
+        </p>
+        <h1 className="text-3xl font-extrabold tracking-tight text-neutral-800">
           Bienvenido, {admin?.nombreCompleto.split(' ')[0] ?? 'Administrador'}
         </h1>
-        <p className="mt-1 text-sm text-surface-500">
-          El acceso ya esta pasando por Express. Los modulos del panel se conectaran a endpoints dedicados del backend.
+        <p className="mt-2 max-w-lg text-sm text-neutral-500 leading-relaxed">
+          Resumen general de toke+. Los datos se cargan en tiempo real desde
+          el backend.
         </p>
       </div>
 
-      <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => (
-          <div key={card.label} className="card group transition-all duration-200 hover:shadow-md">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-medium text-surface-500">{card.label}</p>
-                <p className="mt-2 text-lg font-bold text-surface-900">{card.value}</p>
-              </div>
-              <div className={`rounded-xl p-3 ${card.color}`}>
-                <card.icon className="h-5 w-5" />
-              </div>
-            </div>
-          </div>
-        ))}
+      {/* KPI grid — top level */}
+      <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard
+          label="Usuarios"
+          value={stats?.usuarios.total ?? '—'}
+          icon={Users}
+          detail={stats ? `${stats.usuarios.activos} activos` : undefined}
+        />
+        <StatCard
+          label="Reservas"
+          value={stats?.reservas.total ?? '—'}
+          icon={CalendarDays}
+          detail={stats ? `${stats.reservas.pendientes} pendientes` : undefined}
+        />
+        <StatCard
+          label="Verificaciones"
+          value={stats?.verificaciones.pendientes ?? '—'}
+          icon={ShieldCheck}
+          detail="pendientes de revisión"
+        />
+        <StatCard
+          label="Disputas"
+          value={stats?.disputas.abiertas ?? '—'}
+          icon={AlertTriangle}
+          detail={stats ? `de ${stats.disputas.total} total` : undefined}
+        />
       </div>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="card">
-          <h2 className="text-lg font-semibold text-surface-900">Estado del panel</h2>
-          <p className="mt-2 text-sm text-surface-500">
-            La sesion administrativa ya usa cookies seguras y validacion en backend. El siguiente bloque es conectar usuarios, verificaciones, reservas y disputas a sus endpoints.
+      {/* Second row — breakdown cards */}
+      <div className="mt-5 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <StatCard
+          label="Servicios"
+          value={stats?.servicios.total ?? '—'}
+          icon={Wrench}
+          detail={stats ? `${stats.servicios.activos} activos · ${stats.servicios.categorias} categorías` : undefined}
+        />
+        <StatCard
+          label="Reservas activas"
+          value={stats?.reservas.activas ?? '—'}
+          icon={CalendarDays}
+          detail={stats ? `${stats.reservas.completadas} completadas` : undefined}
+        />
+        <StatCard
+          label="Auditoría"
+          value={stats?.auditoria.total ?? '—'}
+          icon={ClipboardCheck}
+          detail="registros de actividad"
+        />
+      </div>
+
+      {/* Info panels */}
+      <div className="mt-8 grid gap-5 lg:grid-cols-2">
+        <div className="rounded-2xl border border-neutral-100 bg-white p-8 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 mb-4">
+            Usuarios por rol
           </p>
-          <div className="mt-6 rounded-2xl border border-dashed border-surface-300 bg-surface-50 px-6 py-10 text-center">
-            <p className="text-sm font-medium text-surface-700">Autenticacion admin activa</p>
+          <div className="space-y-3">
+            {[
+              { label: 'Administradores', val: stats?.usuarios.admins },
+              { label: 'Clientes', val: stats?.usuarios.clientes },
+              { label: 'Técnicos', val: stats?.usuarios.tecnicos },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="text-sm text-neutral-500">{item.label}</span>
+                <span className="text-sm font-semibold text-neutral-800">
+                  {item.val?.toLocaleString('es-PE') ?? '—'}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="card">
-          <h2 className="text-lg font-semibold text-surface-900">Siguiente hito</h2>
-          <p className="mt-2 text-sm text-surface-500">
-            Recomiendo seguir con `usuarios` y `verificaciones`, porque ambas pantallas ya son coherentes con el flujo de administrador autenticado.
+        <div className="rounded-2xl border border-neutral-100 bg-white p-8 shadow-sm">
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-400 mb-4">
+            Reservas por estado
           </p>
-          <div className="mt-6 flex items-center justify-center rounded-2xl border border-dashed border-surface-300 bg-surface-50 px-6 py-10 text-center">
-            <div className="flex items-center gap-2 text-sm text-surface-500">
-              <AlertTriangle className="h-4 w-4 text-warning-500" />
-              KPIs reales aun no expuestos por el backend
-            </div>
+          <div className="space-y-3">
+            {[
+              { label: 'Pendientes', val: stats?.reservas.pendientes },
+              { label: 'Activas', val: stats?.reservas.activas },
+              { label: 'Completadas', val: stats?.reservas.completadas },
+              { label: 'Canceladas', val: stats?.reservas.canceladas },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center justify-between">
+                <span className="text-sm text-neutral-500">{item.label}</span>
+                <span className="text-sm font-semibold text-neutral-800">
+                  {item.val?.toLocaleString('es-PE') ?? '—'}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
