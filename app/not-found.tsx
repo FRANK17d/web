@@ -3,43 +3,45 @@ import { Logo } from '@/components/logo'
 
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen flex-col bg-surface-50 antialiased">
+    <div className="flex min-h-screen flex-col bg-canvas antialiased">
       <div className="flex flex-1 items-center justify-center p-6">
-        {/* Tarjeta Limpia y Estructurada */}
-        <div className="w-full max-w-lg bg-white rounded-2xl border border-surface-200 shadow-sm p-10 sm:p-14">
+        {/* White card on canvas cream */}
+        <div className="w-full max-w-lg rounded-hero border border-slate/10 bg-white shadow-card p-10 sm:p-14">
           <div className="flex flex-col items-start text-left">
-            
-            {/* Logo minimalista */}
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-surface-100 border border-surface-200 mb-8">
-              <Logo className="h-6 w-6 text-brand-600" />
+
+            {/* Logo circle */}
+            <div className="flex h-12 w-12 items-center justify-center rounded-pill bg-canvas border border-slate/15 mb-8">
+              <Logo className="h-6 w-6 text-ink" />
             </div>
 
-            {/* Tipografía precisa y profesional */}
-            <h1 className="text-[28px] font-semibold tracking-tight text-surface-900 leading-tight">
+            {/* Ghost watermark context */}
+            <p className="eyebrow mb-4">Error del sistema</p>
+
+            <h1 className="text-[28px] font-medium tracking-headline text-ink leading-tight">
               Página no encontrada
             </h1>
-            
-            {/* Texto funcional institucional */}
-            <p className="mt-4 text-[15px] text-surface-500 leading-relaxed">
-              La ruta solicitada no existe en el sistema. Asegúrate de que la dirección web sea correcta o que tengas los permisos correspondientes.
+
+            <p className="mt-4 text-[15px] text-slate leading-relaxed">
+              La ruta solicitada no existe en el sistema. Asegúrate de que la
+              dirección web sea correcta o de que tengas los permisos
+              correspondientes.
             </p>
 
-            {/* Botón sobrio */}
-            <div className="mt-10 flex w-full">
-              <Link 
-                href="/" 
-                className="inline-flex items-center justify-center px-6 py-2.5 text-[15px] font-medium text-white bg-surface-900 rounded-xl hover:bg-surface-800 transition-colors shadow-sm"
+            {/* Ink-pill CTA */}
+            <div className="mt-10">
+              <Link
+                href="/"
+                className="btn-primary text-sm px-7 py-2.5"
               >
                 Volver a la plataforma
               </Link>
             </div>
-            
-            {/* Detalles técnicos en el pie de la tarjeta */}
-            <div className="mt-12 flex items-center justify-between w-full border-t border-surface-100 pt-6">
-               <span className="text-sm font-medium text-surface-400 tracking-wide">ERROR 404</span>
-               <span className="text-sm text-surface-400">MaestroYa</span>
+
+            {/* Footer row */}
+            <div className="mt-12 flex items-center justify-between w-full border-t border-slate/10 pt-6">
+              <span className="eyebrow text-[10px]">Error 404</span>
+              <span className="text-xs text-slate">MaestroYa</span>
             </div>
-            
           </div>
         </div>
       </div>

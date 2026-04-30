@@ -14,7 +14,7 @@ export default async function AdministracionLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-surface-50">
+    <div className="flex min-h-screen bg-neutral-50/50">
       <AdminSidebar userName={admin.nombreCompleto} />
       <main id="main-content" className="ml-64 flex-1 p-8">{children}</main>
     </div>

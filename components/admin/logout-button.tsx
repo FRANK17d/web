@@ -1,13 +1,11 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
 import { LogOut } from 'lucide-react'
 import { callAdminApi } from '@/lib/admin-auth/browser'
 import { FullPageLoader } from '@/components/full-page-loader'
 
 export function AdminLogoutButton() {
-  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
 
@@ -24,8 +22,8 @@ export function AdminLogoutButton() {
         return
       }
 
-      router.push('/administracion/iniciar-sesion')
-      router.refresh()
+      // Hard navigation to clear any cached RSC state and stale cookies
+      window.location.href = '/administracion/iniciar-sesion'
     })
   }
 

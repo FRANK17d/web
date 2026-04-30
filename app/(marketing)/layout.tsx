@@ -1,5 +1,6 @@
-import { Footer } from '@/components/layout/footer'
-import { Navbar } from '@/components/layout/navbar'
+import '@fontsource-variable/plus-jakarta-sans'
+import { MarketingNavbar } from '@/components/marketing/marketing-navbar'
+import { MarketingFooter } from '@/components/marketing/marketing-footer'
 
 export default function MarketingLayout({
   children,
@@ -7,10 +8,10 @@ export default function MarketingLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <Navbar />
-      <main id="main-content" className="flex-1">{children}</main>
-      <Footer />
-    </>
+    <div className="bg-mkt-bg font-jakarta overflow-x-hidden">
+      <MarketingNavbar />
+      <main id="main-content">{children}</main>
+      <MarketingFooter />
+    </div>
   )
 }

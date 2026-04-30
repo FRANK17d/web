@@ -4,8 +4,14 @@
 
 @layer base {
   :root {
-    --background: 248 250 252;
-    --foreground: 15 23 42;
+    /* Canvas surfaces */
+    --canvas: #F3F0EE;
+    --canvas-lifted: #FCFBFA;
+    /* Ink */
+    --ink: #141413;
+    --ink-soft: #262627;
+    /* Muted */
+    --slate: #696969;
   }
 
   html {
@@ -15,37 +21,91 @@
   }
 
   body {
-    @apply bg-surface-50 text-surface-900;
+    /* Canvas Cream — never pure white (DESIGN.md §7) */
+    @apply bg-canvas text-ink font-sans;
   }
 
   ::selection {
-    @apply bg-brand-200 text-brand-900;
+    background-color: #D94F4F;
+    color: #fff;
+  }
+
+  /* Tight headline tracking — DESIGN.md §3 */
+  h1, h2, h3 {
+    letter-spacing: -0.02em;
   }
 }
 
 @layer components {
+  /* ── PRIMARY CTA — Brand Red Pill (Peru identity) ── */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-700 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    @apply inline-flex items-center justify-center gap-2
+           rounded-btn bg-brand-600 px-6 py-2.5
+           text-sm font-medium text-white
+           border border-brand-600
+           transition-all duration-200
+           hover:bg-brand-700
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/40 focus-visible:ring-offset-2
+           active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
+  /* ── SECONDARY CTA — Outlined Pill (DESIGN.md §4) ── */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-surface-300 bg-white px-6 py-3 text-sm font-semibold text-surface-700 shadow-sm transition-all duration-200 hover:bg-surface-50 hover:border-surface-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2
+           rounded-btn bg-white px-6 py-2.5
+           text-sm font-medium text-ink
+           border-[1.5px] border-ink
+           transition-all duration-200
+           hover:bg-canvas
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ink focus-visible:ring-offset-2
+           active:scale-[0.98]
+           disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100;
   }
 
+  /* ── DANGER — keep for admin destructive actions ── */
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-danger-500 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-danger-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-500 focus-visible:ring-offset-2 active:scale-[0.98];
+    @apply inline-flex items-center justify-center gap-2
+           rounded-btn bg-danger-500 px-6 py-[6px]
+           text-base font-medium text-white
+           transition-all duration-200
+           hover:bg-danger-700
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-500 focus-visible:ring-offset-2
+           active:scale-[0.98];
   }
 
+  /* ── INPUT — pill shape, canvas cream bg (DESIGN.md §4) ── */
   .input-field {
-    @apply w-full rounded-xl border border-surface-300 bg-white px-4 py-3 text-sm text-surface-900 placeholder:text-surface-400 transition-colors duration-200 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+    @apply w-full rounded-pill border border-slate/40
+           bg-white px-6 py-3
+           text-sm text-ink placeholder:text-slate
+           transition-colors duration-200
+           focus:border-brand-600 focus:outline-none focus:ring-1 focus:ring-brand-600/20
+           disabled:bg-canvas disabled:text-slate;
   }
 
+  /* ── CARD — white paper laid on cream canvas (DESIGN.md §5) ── */
   .card {
-    @apply rounded-2xl border border-surface-200 bg-white p-6 shadow-sm;
+    @apply rounded-hero border border-slate/10 bg-white px-8 py-8 shadow-card;
   }
 
-  .glass {
-    @apply backdrop-blur-xl bg-white/70 border border-white/20 shadow-lg;
+  /* ── NAV PILL — floating, barely-there lift (DESIGN.md §4) ── */
+  .nav-pill {
+    @apply rounded-pill bg-white shadow-nav border border-white/60;
+  }
+
+  /* ── EYEBROW LABEL — dot + uppercase 14px/700/+4% tracking ── */
+  .eyebrow {
+    @apply text-xs font-bold uppercase text-slate tracking-eyebrow flex items-center gap-1.5;
+  }
+  .eyebrow::before {
+    content: '•';
+    @apply text-gold;
+  }
+
+  /* ── GHOST WATERMARK headline ── */
+  .ghost-headline {
+    @apply text-[72px] font-medium tracking-headline text-ink/5 select-none pointer-events-none;
   }
 }
 
@@ -54,11 +114,131 @@
     text-wrap: balance;
   }
 
-  .gradient-brand {
-    @apply bg-gradient-to-br from-brand-500 via-brand-600 to-brand-800;
+  /* Ink gradient — for admin brand moments */
+  .gradient-ink {
+    @apply bg-gradient-to-br from-ink-soft to-ink;
   }
 
-  .gradient-text {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-brand-400;
+  /* Canvas split background helper */
+  .bg-canvas-lifted {
+    background-color: var(--canvas-lifted);
+  }
+
+  /* Marketing section divider */
+  .mkt-glow {
+    background: radial-gradient(ellipse at center, rgba(217, 79, 79, 0.08) 0%, transparent 70%);
+  }
+
+  .hero-wave-motion {
+    animation: heroWaveDrift 18s linear infinite;
+    will-change: transform;
+  }
+
+  .hero-phone-perspective {
+    backface-visibility: hidden;
+    transform: rotate(2deg);
+    transform-origin: center;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  @media (min-width: 1024px) {
+    .hero-phone-perspective {
+      transform: perspective(1100px) rotateX(1deg) rotateY(5deg) rotateZ(3deg);
+    }
+  }
+
+  .hero-store-buttons {
+    flex-direction: column;
+  }
+
+  @media (min-width: 430px) {
+    .hero-store-buttons {
+      flex-direction: row;
+    }
+  }
+
+  .hero-toke-icon {
+    bottom: -4.5rem;
+    left: 50%;
+    right: auto;
+    width: 8.5rem;
+    transform: translateX(-50%);
+  }
+
+  .scroll-reactive-card {
+    transform: translate3d(0, var(--scroll-shift-y, 0px), 0);
+    transition: transform 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    will-change: transform;
+  }
+
+  @media (min-width: 430px) {
+    .hero-toke-icon {
+      bottom: -5.25rem;
+      width: 10rem;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .hero-toke-icon {
+      bottom: -6.5rem;
+      width: 11rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hero-toke-icon {
+      bottom: -4%;
+      left: auto;
+      right: -140px;
+      width: 220px;
+      transform: none;
+    }
+  }
+
+  .toke-icon-motion {
+    animation: tokeIconFloat 5.5s ease-in-out infinite;
+    transform-origin: center;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    .hero-wave-motion,
+    .toke-icon-motion,
+    .animate-floating,
+    .animate-carousel-left,
+    .animate-carousel-right {
+      animation: none !important;
+    }
+
+    .scroll-reactive-card {
+      transform: translate3d(0, 0, 0);
+      transition: none;
+    }
+  }
+}
+
+@keyframes heroWaveDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+
+  to {
+    transform: translate3d(120px, 0, 0);
+  }
+}
+
+@keyframes tokeIconFloat {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translate3d(0, -14px, 0) rotate(2deg);
   }
 }

@@ -1,5 +1,6 @@
 import 'server-only'
 
+import { cache } from 'react'
 import { cookies } from 'next/headers'
 import { ADMIN_COOKIE_NAMES, getServerBackendUrl } from '@/lib/admin-auth/config'
 
@@ -33,7 +34,10 @@ function buildAdminCookieHeader(cookieStore: Awaited<ReturnType<typeof cookies>>
   return items.join('; ')
 }
 
-export async function getAdminSession() {
+// React.cache() deduplicates calls within the same RSC render pass, so
+// layout.tsx and page.tsx can both call getAdminSession() without triggering
+// two network requests to the backend.
+export const getAdminSession = cache(async () => {
   const cookieStore = await cookies()
   const cookieHeader = buildAdminCookieHeader(cookieStore)
 
@@ -63,4 +67,4 @@ export async function getAdminSession() {
   } catch {
     return null
   }
-}
+})

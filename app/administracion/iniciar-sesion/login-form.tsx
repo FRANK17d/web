@@ -3,51 +3,37 @@
 import type { FormEvent } from 'react'
 import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Eye, EyeOff } from 'lucide-react'
 import { callAdminApi } from '@/lib/admin-auth/browser'
 import { sanitizeAdminRedirect } from '@/lib/admin-auth/config'
 import { toast } from 'sonner'
 
 export function LoginForm() {
-  const router = useRouter()
   const searchParams = useSearchParams()
   const redirectTo = sanitizeAdminRedirect(searchParams.get('redireccion'))
 
   const [isPending, startTransition] = useTransition()
   const [showPassword, setShowPassword] = useState(false)
-  const [isCheckingSession, setIsCheckingSession] = useState(true)
 
   useEffect(() => {
-    let isMounted = true
+    // The server component already checks the session and redirects
+    // authenticated users. This client-side check only handles the bfcache
+    // edge case: the user logged in on another tab and navigated back via
+    // browser history, restoring a stale page from cache.
+    function handlePageShow(event: PageTransitionEvent) {
+      if (!event.persisted) return
 
-    async function syncSessionState() {
-      const result = await callAdminApi('/api/admin/sessions/current')
-
-      if (!isMounted) {
-        return
-      }
-
-      if (result.ok) {
-        router.replace('/administracion')
-        return
-      }
-
-      setIsCheckingSession(false)
+      void callAdminApi('/api/admin/sessions/current').then((result) => {
+        if (result.ok) {
+          window.location.href = '/administracion'
+        }
+      })
     }
 
-    function handlePageShow() {
-      void syncSessionState()
-    }
-
-    void syncSessionState()
     window.addEventListener('pageshow', handlePageShow)
-
-    return () => {
-      isMounted = false
-      window.removeEventListener('pageshow', handlePageShow)
-    }
-  }, [router])
+    return () => window.removeEventListener('pageshow', handlePageShow)
+  }, [])
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -68,96 +54,88 @@ export function LoginForm() {
       }
 
       toast.success('Sesión iniciada correctamente')
-      router.replace(redirectTo)
+      // Hard navigation so the browser sends the freshly-set auth cookies
+      // in the HTTP request. router.replace() would do a soft navigation
+      // where the Next.js server component reads cookies from the original
+      // request (which doesn't have them yet), causing a false auth failure.
+      window.location.href = redirectTo
     })
   }
 
-  if (isCheckingSession) {
-    return (
-      <div role="status" aria-live="polite" className="relative h-[240px] w-full animate-pulse rounded-xl bg-surface-50 sm:h-[280px]">
-        <span className="sr-only">Verificando sesión…</span>
-      </div>
-    )
-  }
-
   return (
-    <>
+    <form onSubmit={handleSubmit} className="space-y-5">
       <div>
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div>
-          <label htmlFor="login-email" className="mb-1.5 block text-sm font-medium text-surface-700 sm:mb-2">
-            Correo electrónico
-          </label>
+        <label htmlFor="login-email" className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          Correo electrónico
+        </label>
+        <input
+          id="login-email"
+          name="correo"
+          type="email"
+          required
+          autoComplete="email"
+          spellCheck={false}
+          placeholder="tu@correo.com"
+          disabled={isPending}
+          className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 placeholder:text-neutral-400 transition-all focus:border-[#EE7070] focus:outline-none focus:ring-2 focus:ring-[#EE7070]/20 disabled:bg-neutral-50 disabled:text-neutral-400"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="login-password" className="mb-1.5 block text-sm font-semibold text-neutral-700">
+          Contraseña
+        </label>
+        <div className="relative">
           <input
-            id="login-email"
-            name="correo"
-            type="email"
+            id="login-password"
+            name="contrasena"
+            type={showPassword ? 'text' : 'password'}
             required
-            autoComplete="email"
-            spellCheck={false}
-            placeholder="Ingresa aquí tu correo electrónico"
+            autoComplete="current-password"
+            placeholder="••••••••"
             disabled={isPending}
-            className="w-full rounded-xl border border-surface-300 px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-surface-50 disabled:text-surface-500 sm:py-2.5 sm:text-base"
+            className="w-full rounded-xl border border-neutral-200 bg-white px-4 py-3 pr-12 text-sm text-neutral-800 placeholder:text-neutral-400 transition-all focus:border-[#EE7070] focus:outline-none focus:ring-2 focus:ring-[#EE7070]/20 disabled:bg-neutral-50 disabled:text-neutral-400"
           />
-        </div>
-
-        <div>
-          <label htmlFor="login-password" className="mb-1.5 block text-sm font-medium text-surface-700 sm:mb-2">
-            Contraseña
-          </label>
-          <div className="relative">
-            <input
-              id="login-password"
-              name="contrasena"
-              type={showPassword ? 'text' : 'password'}
-              required
-              autoComplete="current-password"
-              placeholder="Ingresa aquí tu contraseña"
-              disabled={isPending}
-              className="w-full rounded-xl border border-surface-300 px-3 py-2 pr-10 text-sm text-surface-900 placeholder:text-surface-400 transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500 disabled:bg-surface-50 disabled:text-surface-500 sm:py-2.5 sm:text-base"
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className="absolute right-1 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-lg text-surface-400 hover:bg-surface-100 hover:text-surface-600 focus:outline-none focus:ring-2 focus:ring-brand-500"
-              aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-              title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-            >
-              {showPassword ? <EyeOff className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" /> : <Eye className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />}
-            </button>
-          </div>
-        </div>
-
-        <div className="pt-1 sm:pt-2">
-          <button 
-            type="submit" 
-            disabled={isPending} 
-            className="flex w-full items-center justify-center rounded-xl bg-brand-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 disabled:bg-brand-400 sm:py-3"
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-1 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-lg text-neutral-400 hover:bg-neutral-50 hover:text-neutral-600 focus:outline-none focus:ring-2 focus:ring-[#EE7070]/20 transition-colors"
+            aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+            title={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
           >
-            {isPending ? (
-              <>
-                <svg className="mr-2 h-4 w-4 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Ingresando...
-              </>
-            ) : (
-              'Ingresar'
-            )}
+            {showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}
           </button>
         </div>
+      </div>
 
-        <div className="mt-4 text-center sm:mt-6">
-          <Link 
-            href="/administracion/olvide-mi-contrasena"
-            className="text-xs font-medium text-brand-600 transition-colors hover:text-brand-800 hover:underline sm:text-sm"
-          >
-            ¿Olvidaste tu contraseña?
-          </Link>
-        </div>
-      </form>
-    </div>
-    </>
+      <div className="pt-1">
+        <button
+          type="submit"
+          disabled={isPending}
+          className="w-full rounded-xl bg-[#EE7070] px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#D94F4F] disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#EE7070]/25 active:scale-[0.98]"
+        >
+          {isPending ? (
+            <>
+              <svg className="mr-2 inline h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              Ingresando...
+            </>
+          ) : (
+            'Ingresar'
+          )}
+        </button>
+      </div>
+
+      <div className="mt-4 text-center">
+        <Link
+          href="/administracion/olvide-mi-contrasena"
+          className="text-sm font-medium text-[#EE7070] transition-colors hover:text-[#D94F4F] hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </div>
+    </form>
   )
 }

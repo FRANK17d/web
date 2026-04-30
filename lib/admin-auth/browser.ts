@@ -1,5 +1,3 @@
-import { getBrowserBackendUrl } from '@/lib/admin-auth/config'
-
 type BackendApiResult<T> = {
   ok: boolean
   status: number
@@ -7,9 +5,14 @@ type BackendApiResult<T> = {
   error: string | null
 }
 
+/**
+ * Calls the admin backend API through the Next.js proxy route handler
+ * at /api/admin/[...path]. Requests stay same-origin so auth cookies
+ * are set and sent reliably (no cross-origin cookie issues).
+ */
 export async function callAdminApi<T>(path: string, init?: RequestInit): Promise<BackendApiResult<T>> {
   try {
-    const response = await fetch(`${getBrowserBackendUrl()}${path}`, {
+    const response = await fetch(path, {
       ...init,
       credentials: 'include',
       headers: {
