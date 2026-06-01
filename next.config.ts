@@ -21,9 +21,6 @@ const cspHeader = `
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['10.69.119.17'],
-  turbopack: {
-    root: process.cwd(),
-  },
   async redirects() {
     return [
       {
@@ -78,7 +75,7 @@ const nextConfig: NextConfig = {
     ]
   },
   images: {
-    qualities: [75, 90, 95, 100],
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'https',

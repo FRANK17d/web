@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Toaster } from 'sonner'
+import { inter } from './fonts'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,9 +12,9 @@ export const metadata: Metadata = {
     'Conectamos a los mejores técnicos verificados con hogares en todo el Perú. Electricistas, gasfiteros, pintores y más, a un toque de distancia.',
   keywords: ['servicios hogar', 'técnicos', 'Perú', 'electricista', 'gasfitero', 'plomero', 'pintor', 'toke'],
   icons: {
-    icon: [{ url: '/logo2_toke+.png', type: 'image/png', sizes: '1092x931' }],
-    shortcut: '/logo2_toke+.png',
-    apple: [{ url: '/logo2_toke+.png', type: 'image/png', sizes: '1092x931' }],
+    icon: [{ url: '/logo-toke.webp', type: 'image/webp', sizes: '256x256' }],
+    shortcut: '/logo-toke.webp',
+    apple: [{ url: '/logo-toke.webp', type: 'image/webp', sizes: '256x256' }],
   },
   openGraph: {
     title: 'toke+ — Servicios para el hogar en Perú',
@@ -29,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="h-full" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="es" className={`${inter.variable} h-full`} suppressHydrationWarning data-scroll-behavior="smooth">
       <body className="min-h-full flex flex-col font-sans antialiased">
         <a
           href="#main-content"

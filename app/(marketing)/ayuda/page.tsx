@@ -108,9 +108,9 @@ export default function AyudaPage() {
             <Link
               key={action.title}
               href={action.href}
-              className="group rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-[#EE7070]/30 hover:bg-white hover:shadow-xl hover:shadow-[#D94F4F]/10"
+              className="group rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-[mkt-accent-light]/30 hover:bg-white hover:shadow-xl hover:shadow-[mkt-accent]/10"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#D94F4F] text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[mkt-accent] text-white">
                 <action.icon className="h-5 w-5" />
               </div>
               <h2 className="mt-5 text-lg font-black text-neutral-900">{action.title}</h2>
@@ -123,7 +123,7 @@ export default function AyudaPage() {
       <section className="bg-neutral-50 py-20 lg:py-28">
         <div className="mx-auto max-w-5xl px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D94F4F] text-white">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[mkt-accent] text-white">
               <CircleHelp className="h-7 w-7" />
             </div>
             <h2 className="mt-5 text-3xl font-black tracking-tight text-neutral-900 sm:text-4xl">
@@ -135,7 +135,7 @@ export default function AyudaPage() {
             {faqGroups.map((group) => (
               <div key={group.title} className="rounded-[1.75rem] bg-white p-5 shadow-sm ring-1 ring-neutral-100 sm:p-7">
                 <div className="mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#FFF0EE] text-[#D94F4F]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[mkt-accent-light/10] text-[mkt-accent]">
                     <group.icon className="h-5 w-5" />
                   </div>
                   <h3 className="text-xl font-black text-neutral-900">{group.title}</h3>
@@ -145,7 +145,7 @@ export default function AyudaPage() {
                     <details key={item.q} className="group py-4">
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-left text-base font-black text-neutral-800">
                         {item.q}
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-[#D94F4F] transition group-open:rotate-45">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-[mkt-accent] transition group-open:rotate-45">
                           +
                         </span>
                       </summary>
@@ -165,7 +165,7 @@ export default function AyudaPage() {
       >
         <a
           href="mailto:soporte@toke.app"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-black text-[#D94F4F] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-black text-[mkt-accent] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
         >
           <MessageCircle className="h-4 w-4" />
           Contactar soporte

@@ -77,6 +77,10 @@ const config: Config = {
           text: '#999999',
           accent: '#D94F4F',
           'accent-hover': '#C44545',
+          'accent-light': '#EE7070',
+          'accent-soft': '#F28B82',
+          'accent-gradient-from': '#EE7070',
+          'accent-gradient-to': '#D94F4F',
           light: '#F4F4F5',
         },
         // Neutrals
@@ -105,10 +109,9 @@ const config: Config = {
         },
     },
     fontFamily: {
-      sans: ['system-ui', 'sans-serif'],
-      // Plus Jakarta Sans Variable is loaded only by the marketing layout.
-      jakarta: ['"Plus Jakarta Sans Variable"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-      inter: ['"Inter Variable"', '"Inter"', 'system-ui', 'sans-serif'],
+      sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+      jakarta: ['var(--font-jakarta)', 'system-ui', 'sans-serif'],
+      inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
     },
       borderRadius: {
         // Mastercard radius scale: small (≤6), medium-large (20-40), full-pill (99+)

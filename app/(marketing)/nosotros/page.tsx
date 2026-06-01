@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Binoculars, Handshake, ShieldCheck, Sparkles, Target, UsersRound, type LucideIcon } from 'lucide-react'
 import { TokeLogo } from '@/components/marketing/toke-logo'
@@ -47,15 +46,15 @@ export default function NosotrosPage() {
   return (
     <>
       <section className="relative overflow-hidden bg-white pt-36 pb-20 sm:pt-40 lg:pt-44 lg:pb-28">
-        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-[#FFF0EE] to-white" />
-        <div className="pointer-events-none absolute right-0 top-24 h-[28rem] w-[28rem] translate-x-1/2 rounded-full bg-[#EE7070]/10 blur-3xl" />
+        <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-mkt-accent-light/10 to-white" />
+        <div className="pointer-events-none absolute right-0 top-24 h-[20rem] w-[20rem] sm:h-[28rem] sm:w-[28rem] translate-x-1/3 sm:translate-x-1/2 rounded-full bg-mkt-accent-light/10 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:px-8">
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:px-8">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#D94F4F]">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-mkt-accent">
               La empresa
             </p>
-            <h1 className="mt-4 max-w-4xl text-5xl font-black uppercase leading-[0.95] tracking-tight text-neutral-900 sm:text-6xl lg:text-[88px]">
+            <h1 className="mt-4 max-w-4xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-neutral-900 sm:text-6xl sm:whitespace-nowrap lg:text-[88px]">
               Sobre nosotros
             </h1>
             <div className="mt-8 max-w-2xl space-y-5 text-[15px] leading-7 text-neutral-600 sm:text-base">
@@ -63,7 +62,7 @@ export default function NosotrosPage() {
                 toke+ nace para que encontrar ayuda confiable en casa sea tan simple como pedirla.
               </p>
               <p>
-                Somos una plataforma peruana creada para conectar hogares con profesionales de mantenimiento, reparación e instalación. Sabemos que una urgencia en casa no puede depender de contactos al azar, respuestas tardías o información incompleta.
+                Somos una plataforma creada en Trujillo para conectar hogares con profesionales de mantenimiento, reparación e instalación. Sabemos que una urgencia en casa no puede depender de contactos al azar, respuestas tardías o información incompleta.
               </p>
               <p>
                 Por eso construimos una experiencia que acerca técnicos verificados, categorías claras y una forma más ordenada de solicitar servicios. Queremos que cada persona pueda resolver lo cotidiano con tranquilidad, y que cada profesional tenga una vitrina digna para crecer.
@@ -74,25 +73,10 @@ export default function NosotrosPage() {
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-md lg:max-w-lg">
-            <div className="absolute -inset-6 rounded-[2rem] bg-[#EE7070]/10 blur-2xl" />
-            <div className="relative overflow-hidden rounded-[2rem] border border-[#EE7070]/15 bg-white p-8 shadow-[0_28px_80px_rgba(217,79,79,0.16)]">
-              <div className="flex items-center justify-center rounded-[1.5rem] bg-[#E52525] p-8">
-                <Image
-                  src="/logo2_toke+.png"
-                  alt="Icono de toke+"
-                  width={1092}
-                  height={931}
-                  sizes="(min-width: 1024px) 448px, (min-width: 640px) 384px, calc(100vw - 7rem)"
-                  className="h-auto w-full"
-                  priority
-                />
-              </div>
-              <div className="mt-7 flex items-center justify-between gap-4">
-                <TokeLogo size="lg" variant="color" />
-                <span className="rounded-full bg-[#FFF0EE] px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#D94F4F]">
-                  A un toque
-                </span>
+          <div className="relative mx-auto w-full max-w-sm lg:mt-32">
+            <div className="rounded-[1.5rem] bg-white p-14 sm:p-16 shadow-lg shadow-neutral-900/5 border border-neutral-200/60">
+              <div className="flex items-center justify-center">
+                <TokeLogo size="xl" variant="color" className="h-20 sm:h-24 lg:h-28 w-auto" />
               </div>
             </div>
           </div>
@@ -110,13 +94,13 @@ export default function NosotrosPage() {
             <InfoBlock
               icon={Binoculars}
               title="Visión"
-              text="Ser la plataforma de referencia para servicios del hogar en Perú, fortaleciendo una comunidad donde la tecnología simplifica la confianza y el trabajo bien hecho se vuelve más visible."
+              text="Ser la plataforma de referencia para servicios del hogar en Trujillo y La Libertad, fortaleciendo una comunidad donde la tecnología simplifica la confianza y el trabajo bien hecho se vuelve más visible."
             />
           </div>
 
           <div>
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#D94F4F] text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-mkt-accent text-white">
                 <UsersRound className="h-5 w-5" />
               </div>
               <h2 className="text-3xl font-black text-neutral-800">Valores</h2>
@@ -124,7 +108,7 @@ export default function NosotrosPage() {
             <div className="mt-7 grid gap-4">
               {values.map((value, index) => (
                 <div key={value} className="flex gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-neutral-200/70">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#FFF0EE] text-sm font-black text-[#D94F4F]">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-mkt-accent-light/10 text-sm font-black text-mkt-accent">
                     {index + 1}
                   </span>
                   <p className="text-sm font-medium leading-6 text-neutral-600">{value}</p>
@@ -138,7 +122,7 @@ export default function NosotrosPage() {
       <section className="bg-white py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mb-10 max-w-3xl">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-[#D94F4F]">
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-mkt-accent">
               Cómo trabajamos
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-neutral-900 sm:text-4xl">
@@ -147,8 +131,8 @@ export default function NosotrosPage() {
           </div>
           <div className="grid gap-5 md:grid-cols-3">
             {principles.map((item) => (
-              <div key={item.title} className="rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[#EE7070]/25 hover:bg-white hover:shadow-xl hover:shadow-[#D94F4F]/10">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D94F4F] text-white">
+              <div key={item.title} className="rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-7 transition-all duration-300 hover:-translate-y-1 hover:border-mkt-accent-light/25 hover:bg-white hover:shadow-xl hover:shadow-mkt-accent/10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-mkt-accent text-white">
                   <item.icon className="h-6 w-6" />
                 </div>
                 <h3 className="mt-6 text-xl font-black text-neutral-800">{item.title}</h3>
@@ -161,7 +145,7 @@ export default function NosotrosPage() {
 
       <TeamSection />
 
-      <section className="bg-[#D94F4F] py-16 text-white">
+      <section className="bg-mkt-accent py-16 text-white">
         <div className="mx-auto flex max-w-7xl flex-col gap-8 px-6 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <div className="max-w-2xl">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-white/70">
@@ -173,7 +157,7 @@ export default function NosotrosPage() {
           </div>
           <Link
             href="/#descargar"
-            className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-black text-[#D94F4F] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
+            className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-black text-mkt-accent shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
           >
             Descargar la app
           </Link>
@@ -194,7 +178,7 @@ function InfoBlock({
 }) {
   return (
     <div className="flex gap-5">
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#D94F4F] text-white">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-mkt-accent text-white">
         <Icon className="h-6 w-6" />
       </div>
       <div>

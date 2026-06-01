@@ -51,7 +51,7 @@ export default function TerminosPage() {
         <div className="mx-auto grid max-w-7xl gap-5 px-6 md:grid-cols-2 lg:px-8">
           {terms.map((item) => (
             <article key={item.title} className="rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-7">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D94F4F] text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[mkt-accent] text-white">
                 <item.icon className="h-6 w-6" />
               </div>
               <h2 className="mt-6 text-xl font-black text-neutral-900">{item.title}</h2>
@@ -64,7 +64,7 @@ export default function TerminosPage() {
       <section className="bg-neutral-50 py-20 lg:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[0.85fr_1.15fr] lg:px-8">
           <div>
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#D94F4F] text-white">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[mkt-accent] text-white">
               <Scale className="h-7 w-7" />
             </div>
             <h2 className="mt-6 text-3xl font-black tracking-tight text-neutral-900 sm:text-4xl">
@@ -89,7 +89,7 @@ export default function TerminosPage() {
       >
         <Link
           href="/ayuda"
-          className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-black text-[#D94F4F] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
+          className="inline-flex items-center justify-center rounded-full bg-white px-7 py-3.5 text-sm font-black text-[mkt-accent] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
         >
           Ir a ayuda
         </Link>
@@ -102,7 +102,7 @@ function PolicyRow({ title, text }: { title: string; text: string }) {
   return (
     <div className="rounded-[1.35rem] bg-white p-6 shadow-sm ring-1 ring-neutral-100">
       <div className="flex items-start gap-4">
-        <AlertCircle className="mt-1 h-5 w-5 shrink-0 text-[#D94F4F]" />
+        <AlertCircle className="mt-1 h-5 w-5 shrink-0 text-[mkt-accent]" />
         <div>
           <h3 className="text-base font-black text-neutral-900">{title}</h3>
           <p className="mt-2 text-sm leading-7 text-neutral-600">{text}</p>
