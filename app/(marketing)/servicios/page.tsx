@@ -17,9 +17,9 @@ export const metadata: Metadata = {
     url: 'https://tokeplus.app/servicios',
     images: [
       {
-        url: '/ctr-redsocials.png',
-        width: 1731,
-        height: 909,
+        url: '/og-whatsapp.jpg',
+        width: 1200,
+        height: 630,
         alt: 'toke+ — Servicios para el hogar en Perú',
       },
     ],
