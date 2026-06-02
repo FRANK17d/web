@@ -22,11 +22,20 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_PE',
     url: 'https://tokeplus.app',
+    images: [
+      {
+        url: '/ctr-redsocials.png',
+        width: 1731,
+        height: 909,
+        alt: 'toke+ — Servicios para el hogar en Perú',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'toke+ — Servicios para el hogar en Perú',
     description: 'Técnicos verificados para tu hogar, al instante.',
+    images: ['/ctr-redsocials.png'],
   },
   robots: {
     index: true,
