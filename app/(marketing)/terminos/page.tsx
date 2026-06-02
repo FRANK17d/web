@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_PE',
     url: 'https://tokeplus.app/terminos',
+    images: [
+      {
+        url: '/ctr-redsocials.png',
+        width: 1731,
+        height: 909,
+        alt: 'toke+ — Servicios para el hogar en Perú',
+      },
+    ],
   },
   alternates: {
     canonical: 'https://tokeplus.app/terminos',
