@@ -60,15 +60,15 @@ export function MarketingFooter() {
           {/* Column 1 — Brand + Address */}
           <div>
             <TokeLogo size="lg" variant="white" />
-            <div className="mt-6 border-l-2 border-[#EE7070] pl-4">
+            <div className="mt-6 space-y-4 border-l-2 border-mkt-accent-light pl-4">
               <p className="text-sm leading-relaxed text-neutral-400">
-                <span className="font-semibold text-neutral-300">Dirección:</span> Lima, Perú.
+                <span className="font-semibold text-neutral-300">Dirección:</span> Trujillo, La Libertad, Perú.
+              </p>
+              <p className="text-sm text-neutral-400">
+                <span className="font-semibold text-neutral-300">Teléfono:</span>{' '}
+                <a href="tel:+51968899167" className="transition-colors hover:text-white">+51 968 899 167</a>
               </p>
             </div>
-            <p className="mt-4 text-sm text-neutral-400">
-              <span className="font-semibold text-neutral-300">Teléfono:</span>{' '}
-              <a href="tel:+51999999999" className="transition-colors hover:text-white">+51 999 999 999</a>
-            </p>
           </div>
 
           {/* Column 2 — Links */}
@@ -116,19 +116,21 @@ export function MarketingFooter() {
             <div className="mt-8 flex flex-col gap-3">
               <a href="#" className="block transition-opacity hover:opacity-80">
                 <Image
-                  src="/Google-Play.png"
+                  src="/badge-google-play.webp"
                   alt="Descargar en Google Play"
                   width={149}
                   height={44}
+                  sizes="160px"
                   style={{ width: 160, height: 'auto' }}
                 />
               </a>
               <a href="#" className="block transition-opacity hover:opacity-80">
                 <Image
-                  src="/AppStore.png"
+                  src="/badge-app-store.webp"
                   alt="Descargar en App Store"
                   width={132}
                   height={44}
+                  sizes="160px"
                   style={{ width: 160, height: 'auto' }}
                 />
               </a>

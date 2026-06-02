@@ -7,14 +7,13 @@ import {
   FeaturesSection,
   StepsSection,
   ProfessionalsSection,
-  StatsSection,
   DownloadCtaSection,
 } from '@/components/marketing/sections'
 
 export const metadata: Metadata = {
   title: 'toke+ — Servicios para el hogar a un toque',
   description:
-    'Conectamos a los mejores técnicos verificados con hogares en todo el Perú. Electricistas, gasfiteros, pintores y más, a un toque de distancia.',
+    'Conectamos a los mejores técnicos verificados con hogares en Trujillo. Electricistas, gasfiteros, pintores y más, a un toque de distancia.',
   openGraph: {
     title: 'toke+ — Servicios para el hogar a un toque',
     description: 'Técnicos verificados para tu hogar, al instante.',
@@ -33,7 +32,6 @@ export default function HomePage() {
       <FeaturesSection />
       <StepsSection />
       <ProfessionalsSection />
-      <StatsSection />
       <DownloadCtaSection />
     </>
   )

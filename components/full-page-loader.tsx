@@ -22,7 +22,7 @@ export function FullPageLoader({ label = 'Preparando toke+...' }: FullPageLoader
           <div className="absolute inset-0 animate-[pulse-ring_2s_cubic-bezier(0.4,0,0.6,1)_infinite] rounded-3xl bg-[#EE7070]/10" />
           {/* Logo */}
           <Image
-            src="/logo2_toke+.png"
+            src="/logo-toke.webp"
             alt="toke+"
             width={96}
             height={120}

@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { TokeLogo } from './toke-logo'
 import { Menu, X, Download } from 'lucide-react'
 
@@ -16,7 +17,9 @@ export function MarketingNavbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const isScrolledRef = useRef(false)
   const frameRef = useRef<number | null>(null)
+  const pathname = usePathname()
 
+  // Scroll-reactive navbar shrink
   useEffect(() => {
     const syncScrollState = () => {
       frameRef.current = null
@@ -47,6 +50,26 @@ export function MarketingNavbar() {
     }
   }, [])
 
+  // Close menu on scroll (dropdown should dismiss)
+  useEffect(() => {
+    if (!open) return
+    const dismiss = () => setOpen(false)
+    window.addEventListener('scroll', dismiss, { passive: true, once: true })
+    return () => window.removeEventListener('scroll', dismiss)
+  }, [open])
+
+  // Close on Escape key
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') setOpen(false)
+  }, [])
+
+  useEffect(() => {
+    if (open) {
+      document.addEventListener('keydown', handleKeyDown)
+    }
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [open, handleKeyDown])
+
   return (
     <header
       className={`fixed left-0 right-0 top-3 z-50 px-4 transition-all duration-300 sm:px-6 ${
@@ -70,20 +93,23 @@ export function MarketingNavbar() {
 
         {/* Desktop links */}
         <div className="hidden items-center gap-7 md:flex">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`text-base font-bold text-neutral-700 transition-all duration-300 hover:text-[#D94F4F] ${
-                isScrolled ? 'lg:text-sm' : 'lg:text-base'
-              }`}
-            >
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`text-base font-bold transition-all duration-300 hover:text-mkt-accent ${
+                  isActive ? 'text-mkt-accent-light' : 'text-neutral-700'
+                } ${isScrolled ? 'lg:text-sm' : 'lg:text-base'}`}
+              >
+                {link.label}
+              </Link>
+            )
+          })}
           <Link
             href="/#descargar"
-            className={`flex items-center gap-2 rounded-full bg-[#D94F4F] px-6 py-2 text-base font-bold text-white transition-all duration-300 hover:bg-[#C44545] active:scale-[0.97] ${
+            className={`flex items-center gap-2 rounded-full bg-mkt-accent px-6 py-2 text-base font-bold text-white transition-all duration-300 hover:bg-mkt-accent-hover active:scale-[0.97] ${
               isScrolled ? 'lg:px-5 lg:py-1.5 lg:text-sm' : 'lg:px-6 lg:py-2 lg:text-base'
             }`}
           >
@@ -101,38 +127,48 @@ export function MarketingNavbar() {
           onClick={() => setOpen(!open)}
           className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl text-neutral-700 md:hidden"
           aria-label={open ? 'Cerrar menú' : 'Abrir menú'}
+          aria-expanded={open}
+          aria-controls="mobile-nav-menu"
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
       </nav>
 
-      {/* Mobile menu */}
-      {open && (
-        <div className="fixed inset-0 z-40 flex flex-col bg-white px-6 pt-24 pb-8 md:hidden">
-          <div className="flex flex-col gap-5">
-            {navLinks.map((link) => (
+      {/* Mobile menu — dropdown panel below nav */}
+      <div
+        id="mobile-nav-menu"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menú de navegación"
+        className={`absolute left-4 right-4 top-full mt-2 z-40 rounded-2xl bg-white px-6 py-5 shadow-xl shadow-black/10 border border-neutral-100 md:hidden transition-all duration-200 origin-top ${
+          open ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'
+        }`}
+      >
+        <nav className="flex flex-col gap-4">
+          {navLinks.map((link) => {
+            const isActive = link.href === '/' ? pathname === '/' : pathname.startsWith(link.href)
+            return (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="text-xl font-semibold text-neutral-800 transition-colors hover:text-[#D94F4F]"
+                className={`text-base font-semibold transition-colors hover:text-mkt-accent ${
+                  isActive ? 'text-mkt-accent-light' : 'text-neutral-800'
+                }`}
               >
                 {link.label}
               </Link>
-            ))}
-          </div>
-          <div className="mt-auto">
-            <Link
-              href="/#descargar"
-              onClick={() => setOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#D94F4F] py-4 text-base font-semibold text-white transition-all hover:bg-[#C44545]"
-            >
-              <span>Descarga la app</span>
-              <Download className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      )}
+            )
+          })}
+          <Link
+            href="/#descargar"
+            onClick={() => setOpen(false)}
+            className="text-base font-semibold text-neutral-800 transition-colors hover:text-mkt-accent"
+          >
+            Descargar la app
+          </Link>
+        </nav>
+      </div>
     </header>
   )
 }

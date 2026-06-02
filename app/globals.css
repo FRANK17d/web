@@ -129,6 +129,74 @@
     background: radial-gradient(ellipse at center, rgba(217, 79, 79, 0.08) 0%, transparent 70%);
   }
 
+  /* ─── DYNAMISM UTILITIES (CSS-only, GPU-accelerated) ─── */
+
+  /* 1. Hero gradient shift — subtle background hue cycling */
+  .hero-gradient-shift {
+    background-size: 200% 200%;
+    animation: gradientShift 12s ease-in-out infinite;
+  }
+
+  /* 2. CTA pulse ring — draws eye to download buttons */
+  .cta-pulse {
+    position: relative;
+  }
+
+  .cta-pulse::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    border: 2px solid currentColor;
+    opacity: 0;
+    animation: ctaPulseRing 2.5s ease-out infinite;
+  }
+
+  /* 3. Service pill — hover micro-interaction */
+  .pill-interactive {
+    transition: transform 200ms ease, box-shadow 200ms ease;
+  }
+
+  .pill-interactive:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 24px rgba(217, 79, 79, 0.12);
+  }
+
+  /* 4. Gradient text sweep — heading shimmer on entry */
+  .text-shimmer {
+    background: linear-gradient(
+      90deg,
+      currentColor 0%,
+      #EE7070 45%,
+      currentColor 55%,
+      currentColor 100%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShimmer 3s ease-in-out 1;
+    animation-delay: 0.3s;
+    animation-fill-mode: forwards;
+    background-position: 100% 0;
+  }
+
+  /* 5. Number counter pop — scale entrance for step numbers */
+  .number-pop {
+    display: inline-flex;
+    animation: numberPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  /* 6. Hover lift — universal card lift */
+  .hover-lift {
+    transition: transform 300ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 300ms ease;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  }
+
   .hero-wave-motion {
     animation: heroWaveDrift 18s linear infinite;
     will-change: transform;
@@ -172,6 +240,18 @@
     will-change: transform;
   }
 
+  /* Scroll-reactive zoom — scale on scroll direction */
+  .scroll-reactive-zoom {
+    transform: scale(var(--scroll-zoom, 1));
+    transition: transform 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Scroll-reactive bounce — directional shift for arrows */
+  .scroll-reactive-bounce {
+    transform: translateY(var(--scroll-bounce-y, 0px));
+    transition: transform 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
   @media (min-width: 430px) {
     .hero-toke-icon {
       bottom: -5.25rem;
@@ -202,6 +282,19 @@
     will-change: transform;
   }
 
+  /* Carousel — explicit classes for Turbopack compatibility */
+  .animate-carousel-left {
+    animation: carouselLeft 30s linear infinite;
+  }
+
+  .animate-carousel-right {
+    animation: carouselRight 30s linear infinite;
+  }
+
+  .animate-floating {
+    animation: float 6s ease-in-out infinite;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-behavior: auto;
@@ -209,10 +302,19 @@
 
     .hero-wave-motion,
     .toke-icon-motion,
-    .animate-floating,
-    .animate-carousel-left,
-    .animate-carousel-right {
+    .animate-floating {
       animation: none !important;
+    }
+
+    /* Carousel is functional (shows more items exist), so we slow it 
+       instead of stopping it — WCAG 2.1 SC 2.2.2 allows this for 
+       auto-updating content that is not the primary content. */
+    .animate-carousel-left {
+      animation: carouselLeft 120s linear infinite !important;
+    }
+
+    .animate-carousel-right {
+      animation: carouselRight 120s linear infinite !important;
     }
 
     .scroll-reactive-card {
@@ -240,5 +342,184 @@
 
   50% {
     transform: translate3d(0, -14px, 0) rotate(2deg);
+  }
+}
+
+/* ─── Carousel infinite scroll (Turbopack needs explicit @keyframes) ─── */
+@keyframes carouselLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes carouselRight {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes aosBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes ctaPulseRing {
+  0% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  70% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes textShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+@keyframes numberPop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ─── Scroll-triggered animations (AnimateOnScroll component) ─── */
+.aos-element {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.aos-element.aos-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1) !important;
+  will-change: auto;
+}
+
+/* Variants — initial states */
+.aos-fade-up {
+  transform: translate3d(0, 40px, 0);
+}
+
+.aos-fade-down {
+  transform: translate3d(0, -40px, 0);
+}
+
+.aos-fade-left {
+  transform: translate3d(50px, 0, 0);
+}
+
+.aos-fade-right {
+  transform: translate3d(-50px, 0, 0);
+}
+
+.aos-zoom-in {
+  transform: scale(0.9);
+}
+
+.aos-zoom-out {
+  transform: scale(1.1);
+}
+
+/* Bounce variant — uses keyframe animation instead of transition */
+.aos-bounce {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.aos-element.aos-bounce.aos-visible {
+  animation: aosBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  will-change: auto;
+}
+
+/* Respect prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .aos-element {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Bounce is subtle and brief (0.6s) — allow it even with reduced-motion */
+  .aos-element.aos-bounce.aos-visible {
+    animation: aosBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+  }
+
+  .hero-gradient-shift {
+    animation: none;
+    background-position: 0% 50%;
+  }
+
+  .cta-pulse::after {
+    animation: none;
+    opacity: 0;
+  }
+
+  .text-shimmer {
+    animation: none;
+    -webkit-text-fill-color: unset;
+    background: none;
+  }
+
+  .number-pop {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
