@@ -5,15 +5,19 @@ import { TokeLogo } from '@/components/marketing/toke-logo'
 import { TeamSection } from '@/components/marketing/team-section'
 
 export const metadata: Metadata = {
-  title: 'Nosotros',
+  title: 'Nosotros — Equipo detrás de toke+',
   description:
-    'Conoce la visión de toke+: conectar hogares con profesionales verificados para resolver servicios del hogar de forma simple, segura y cercana.',
+    'Conoce la visión de toke+: conectar hogares con profesionales verificados para resolver servicios del hogar de forma simple, segura y cercana en Trujillo.',
   openGraph: {
     title: 'Nosotros | toke+',
     description:
       'Conectamos hogares con técnicos verificados para que cada arreglo, instalación o mantenimiento esté a un toque de distancia.',
     type: 'website',
     locale: 'es_PE',
+    url: 'https://tokeplus.app/nosotros',
+  },
+  alternates: {
+    canonical: 'https://tokeplus.app/nosotros',
   },
 }
 

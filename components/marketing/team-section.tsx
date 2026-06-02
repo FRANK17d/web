@@ -7,13 +7,13 @@ const team = [
   {
     name: 'Edgar Insfran',
     role: 'CEO',
-    detail: 'Estrategia, gestion de proyectos y crecimiento.',
+    detail: 'Estrategia, gestión de proyectos y crecimiento.',
     image: '/edgar-insfran.webp',
   },
   {
     name: 'Edgar Cabral',
     role: 'CTO',
-    detail: 'Tecnologia, analisis y diseno integral de software.',
+    detail: 'Tecnología, análisis y diseño integral de software.',
     image: '/edgar-cabral.webp',
   },
   {
@@ -25,7 +25,7 @@ const team = [
   {
     name: 'Equipo Plataforma',
     role: 'Desarrollo',
-    detail: 'Arquitectura, calidad y estabilidad de la aplicacion.',
+    detail: 'Arquitectura, calidad y estabilidad de la aplicación.',
     image: '/edgar-cabral.webp',
   },
 ]
@@ -48,10 +48,10 @@ export function TeamSection() {
             El equipo
           </p>
           <h2 className="mt-3 text-4xl font-black tracking-tight text-neutral-900 sm:text-5xl">
-            Personas detras de toke+
+            Personas detrás de toke+
           </h2>
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-7 text-neutral-600 sm:text-base">
-            Un gran proyecto necesita un gran equipo. Desde la estrategia hasta la tecnologia, cada rol aporta su talento para que pedir ayuda en casa sea mas simple, seguro y rapido.
+            Un gran proyecto necesita un gran equipo. Desde la estrategia hasta la tecnología, cada rol aporta su talento para que pedir ayuda en casa sea más simple, seguro y rápido.
           </p>
         </div>
 

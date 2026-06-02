@@ -19,12 +19,57 @@ export const metadata: Metadata = {
     description: 'Técnicos verificados para tu hogar, al instante.',
     type: 'website',
     locale: 'es_PE',
+    url: 'https://tokeplus.app',
+  },
+  alternates: {
+    canonical: 'https://tokeplus.app',
+  },
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'toke+',
+  url: 'https://tokeplus.app',
+  description:
+    'Plataforma que conecta hogares con técnicos verificados para servicios de mantenimiento, reparación e instalación en Trujillo, Perú.',
+  applicationCategory: 'HomeServices',
+  operatingSystem: 'Android, iOS',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'PEN',
+    description: 'Descarga gratuita',
+  },
+  provider: {
+    '@type': 'Organization',
+    name: 'toke+',
+    url: 'https://tokeplus.app',
+    logo: 'https://tokeplus.app/toke-logo.svg',
+    areaServed: {
+      '@type': 'City',
+      name: 'Trujillo',
+      containedInPlace: {
+        '@type': 'AdministrativeArea',
+        name: 'La Libertad, Perú',
+      },
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      email: 'soporte@toke.app',
+      availableLanguage: 'Spanish',
+    },
   },
 }
 
 export default function HomePage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <HeroSection />
       <ProblemSection />
       <ServicesSection />

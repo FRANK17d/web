@@ -4,23 +4,43 @@ import { inter } from './fonts'
 import './globals.css'
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tokeplus.app'),
   title: {
     default: 'toke+ — Servicios para el hogar en Perú',
     template: '%s | toke+',
   },
   description:
     'Conectamos a los mejores técnicos verificados con hogares en todo el Perú. Electricistas, gasfiteros, pintores y más, a un toque de distancia.',
-  keywords: ['servicios hogar', 'técnicos', 'Perú', 'electricista', 'gasfitero', 'plomero', 'pintor', 'toke'],
-  icons: {
-    icon: [{ url: '/logo-toke.webp', type: 'image/webp', sizes: '256x256' }],
-    shortcut: '/logo-toke.webp',
-    apple: [{ url: '/logo-toke.webp', type: 'image/webp', sizes: '256x256' }],
-  },
+  keywords: ['servicios hogar', 'técnicos', 'Perú', 'electricista', 'gasfitero', 'plomero', 'pintor', 'toke', 'mantenimiento', 'reparaciones', 'Trujillo'],
+  authors: [{ name: 'toke+' }],
+  creator: 'toke+',
+  publisher: 'toke+',
   openGraph: {
     title: 'toke+ — Servicios para el hogar en Perú',
     description: 'Técnicos verificados para tu hogar, al instante.',
+    siteName: 'toke+',
     type: 'website',
     locale: 'es_PE',
+    url: 'https://tokeplus.app',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'toke+ — Servicios para el hogar en Perú',
+    description: 'Técnicos verificados para tu hogar, al instante.',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  alternates: {
+    canonical: 'https://tokeplus.app',
   },
 }
 

@@ -5,22 +5,26 @@ import { ArrowRight, BadgeCheck, Clock3, MapPin, ShieldCheck, Sparkles, Users, Z
 import { steps } from '@/components/marketing/sections/data'
 
 export const metadata: Metadata = {
-  title: 'Servicios',
+  title: 'Servicios para el hogar en Trujillo',
   description:
-    'Explora los servicios para el hogar disponibles en toke+: tecnicos verificados para mantenimiento, reparaciones, instalaciones y mas.',
+    'Explora los servicios para el hogar disponibles en toke+: técnicos verificados para mantenimiento, reparaciones, instalaciones y más en Trujillo.',
   openGraph: {
-    title: 'Servicios | toke+',
+    title: 'Servicios para el hogar | toke+',
     description:
-      'Encuentra tecnicos verificados para mantenimiento, reparaciones e instalaciones del hogar.',
+      'Encuentra técnicos verificados para mantenimiento, reparaciones e instalaciones del hogar en Trujillo.',
     type: 'website',
     locale: 'es_PE',
+    url: 'https://tokeplus.app/servicios',
+  },
+  alternates: {
+    canonical: 'https://tokeplus.app/servicios',
   },
 }
 
 const highlights = [
   {
-    label: 'Tecnicos verificados',
-    text: 'Perfiles con experiencia, datos claros y reputacion visible antes de contratar.',
+    label: 'Técnicos verificados',
+    text: 'Perfiles con experiencia, datos claros y reputación visible antes de contratar.',
     icon: ShieldCheck,
   },
   {
@@ -30,7 +34,7 @@ const highlights = [
   },
   {
     label: 'Proceso simple',
-    text: 'Describe lo que necesitas, elige una opcion y coordina sin vueltas.',
+    text: 'Describe lo que necesitas, elige una opción y coordina sin vueltas.',
     icon: Clock3,
   },
 ]
@@ -38,7 +42,7 @@ const highlights = [
 const benefits = [
   {
     title: 'Publica tu necesidad',
-    text: 'No importa el servicio. Describe que necesitas y la app se encarga de conectar con profesionales cercanos.',
+    text: 'No importa el servicio. Describe qué necesitas y la app se encarga de conectar con profesionales cercanos.',
     icon: Zap,
   },
   {
@@ -48,7 +52,7 @@ const benefits = [
   },
   {
     title: 'Paga seguro al finalizar',
-    text: 'El pago se libera cuando confirmas que el trabajo quedo bien. Sin sorpresas ni adelantos riesgosos.',
+    text: 'El pago se libera cuando confirmas que el trabajo quedó bien. Sin sorpresas ni adelantos riesgosos.',
     icon: BadgeCheck,
   },
 ]
@@ -68,7 +72,7 @@ export default function ServiciosPage() {
               Todo lo que tu hogar necesita, a un toque
             </h1>
             <p className="mt-7 max-w-xl text-base leading-8 text-neutral-600 sm:text-lg">
-              Mantenimiento, reparaciones, instalaciones y mucho mas. toke+ te conecta con profesionales verificados en Trujillo para que cada problema del hogar tenga una solucion rapida y confiable.
+              Mantenimiento, reparaciones, instalaciones y mucho más. toke+ te conecta con profesionales verificados en Trujillo para que cada problema del hogar tenga una solución rápida y confiable.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -82,7 +86,7 @@ export default function ServiciosPage() {
                 href="#como-funciona"
                 className="inline-flex items-center justify-center rounded-full border border-neutral-200 bg-white px-7 py-3.5 text-sm font-black text-neutral-700 transition-colors hover:bg-neutral-50"
               >
-                Como funciona
+                Cómo funciona
               </a>
             </div>
           </div>
@@ -125,13 +129,13 @@ export default function ServiciosPage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-mkt-accent">
-              Por que toke+
+              Por qué toke+
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-neutral-900 sm:text-5xl">
-              Mas orden, menos incertidumbre
+              Más orden, menos incertidumbre
             </h2>
             <p className="mt-5 text-base leading-7 text-neutral-600">
-              El valor de toke+ no es solo mostrar una lista de servicios. Es ayudarte a pedir mejor, elegir con mas informacion y coordinar con profesionales que entienden la necesidad de tu hogar.
+              El valor de toke+ no es solo mostrar una lista de servicios. Es ayudarte a pedir mejor, elegir con más información y coordinar con profesionales que entienden la necesidad de tu hogar.
             </p>
           </div>
 
@@ -154,10 +158,10 @@ export default function ServiciosPage() {
         <div className="mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-2 lg:items-center lg:px-8">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.22em] text-mkt-accent">
-              Como funciona
+              Cómo funciona
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight text-neutral-900 sm:text-5xl">
-              De problema a solucion en minutos
+              De problema a solución en minutos
             </h2>
             <p className="mt-5 max-w-lg text-base leading-7 text-neutral-600">
               No importa si es una urgencia o un proyecto planificado. En tres pasos simples, ya tienes un profesional en camino.
@@ -188,7 +192,7 @@ export default function ServiciosPage() {
               Listo para empezar
             </p>
             <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
-              Publica tu pedido y deja que toke+ acerque la solucion.
+              Publica tu pedido y deja que toke+ acerque la solución.
             </h2>
           </div>
           <Link

@@ -4,7 +4,7 @@ import { CircleHelp, ClipboardList, Mail, MessageCircle, ShieldCheck, Smartphone
 import { MarketingCtaBand, MarketingSubpageHero } from '@/components/marketing/page-blocks'
 
 export const metadata: Metadata = {
-  title: 'Centro de ayuda',
+  title: 'Centro de ayuda — Preguntas frecuentes',
   description:
     'Preguntas frecuentes de toke+ para clientes y profesionales: solicitudes, servicios, seguridad, cuenta y soporte.',
   openGraph: {
@@ -12,6 +12,10 @@ export const metadata: Metadata = {
     description: 'Preguntas frecuentes y soporte para usar toke+.',
     type: 'website',
     locale: 'es_PE',
+    url: 'https://tokeplus.app/ayuda',
+  },
+  alternates: {
+    canonical: 'https://tokeplus.app/ayuda',
   },
 }
 
@@ -21,16 +25,16 @@ const faqGroups = [
     icon: UserRound,
     questions: [
       {
-        q: 'Como pido un servicio?',
-        a: 'Elige la categoria, describe lo que necesitas y agrega detalles como zona, horario o fotos. Con esa informacion, toke+ puede acercarte profesionales relacionados con tu solicitud.',
+        q: '¿Cómo pido un servicio?',
+        a: 'Elige la categoría, describe lo que necesitas y agrega detalles como zona, horario o fotos. Con esa información, toke+ puede acercarte profesionales relacionados con tu solicitud.',
       },
       {
-        q: 'Puedo elegir al tecnico?',
+        q: '¿Puedo elegir al técnico?',
         a: 'La idea de toke+ es que puedas revisar opciones, comparar perfiles y coordinar con el profesional que mejor se ajuste a tu necesidad.',
       },
       {
-        q: 'Que hago si mi problema es urgente?',
-        a: 'Describe la urgencia desde el inicio y selecciona la categoria correcta. Mientras mas claro sea el pedido, mas facil sera recibir una respuesta adecuada.',
+        q: '¿Qué hago si mi problema es urgente?',
+        a: 'Describe la urgencia desde el inicio y selecciona la categoría correcta. Mientras más claro sea el pedido, más fácil será recibir una respuesta adecuada.',
       },
     ],
   },
@@ -39,15 +43,15 @@ const faqGroups = [
     icon: Wrench,
     questions: [
       {
-        q: 'Como recibo pedidos?',
-        a: 'Los pedidos se relacionan con tu zona, categorias y disponibilidad. Mantener tu perfil completo ayuda a que los clientes entiendan mejor tu experiencia.',
+        q: '¿Cómo recibo pedidos?',
+        a: 'Los pedidos se relacionan con tu zona, categorías y disponibilidad. Mantener tu perfil completo ayuda a que los clientes entiendan mejor tu experiencia.',
       },
       {
-        q: 'Que datos debo mostrar?',
-        a: 'Datos de contacto, zonas de atencion, especialidades y referencias del trabajo que realizas. La informacion debe ser real y estar actualizada.',
+        q: '¿Qué datos debo mostrar?',
+        a: 'Datos de contacto, zonas de atención, especialidades y referencias del trabajo que realizas. La información debe ser real y estar actualizada.',
       },
       {
-        q: 'Puedo rechazar un pedido?',
+        q: '¿Puedo rechazar un pedido?',
         a: 'Si un pedido no coincide con tu disponibilidad o especialidad, puedes no tomarlo. Lo importante es comunicar con claridad y respeto.',
       },
     ],
@@ -57,16 +61,16 @@ const faqGroups = [
     icon: ShieldCheck,
     questions: [
       {
-        q: 'Como protege toke+ a la comunidad?',
+        q: '¿Cómo protege toke+ a la comunidad?',
         a: 'La plataforma puede revisar perfiles, reportes y actividad para prevenir fraudes, mejorar la calidad del servicio y cuidar la confianza entre usuarios.',
       },
       {
-        q: 'Que hago si tengo un problema con un servicio?',
-        a: 'Reune la informacion del pedido, fotos si corresponde y el detalle de lo ocurrido. Con esos datos, el soporte podra orientarte mejor.',
+        q: '¿Qué hago si tengo un problema con un servicio?',
+        a: 'Reúne la información del pedido, fotos si corresponde y el detalle de lo ocurrido. Con esos datos, el soporte podrá orientarte mejor.',
       },
       {
-        q: 'Como cambio mis datos?',
-        a: 'Cuando la cuenta este habilitada, podras actualizar informacion desde tu perfil o solicitar ayuda al canal de soporte.',
+        q: '¿Cómo cambio mis datos?',
+        a: 'Cuando la cuenta esté habilitada, podrás actualizar información desde tu perfil o solicitar ayuda al canal de soporte.',
       },
     ],
   },
@@ -75,7 +79,7 @@ const faqGroups = [
 const quickActions = [
   {
     title: 'Pedir un servicio',
-    text: 'Explora las categorias disponibles y encuentra ayuda para tu hogar.',
+    text: 'Explora las categorías disponibles y encuentra ayuda para tu hogar.',
     href: '/servicios',
     icon: ClipboardList,
   },
@@ -87,7 +91,7 @@ const quickActions = [
   },
   {
     title: 'Hablar con soporte',
-    text: 'Usa el canal de contacto que toke+ habilite para atencion.',
+    text: 'Usa el canal de contacto que toke+ habilite para atención.',
     href: 'mailto:soporte@toke.app',
     icon: Mail,
   },
@@ -99,7 +103,7 @@ export default function AyudaPage() {
       <MarketingSubpageHero
         eyebrow="Soporte"
         title="Centro de ayuda"
-        description="Respuestas rapidas para clientes y profesionales que usan toke+ para coordinar servicios del hogar."
+        description="Respuestas rápidas para clientes y profesionales que usan toke+ para coordinar servicios del hogar."
       />
 
       <section className="bg-white py-16 lg:py-20">
@@ -108,9 +112,9 @@ export default function AyudaPage() {
             <Link
               key={action.title}
               href={action.href}
-              className="group rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-[mkt-accent-light]/30 hover:bg-white hover:shadow-xl hover:shadow-[mkt-accent]/10"
+              className="group rounded-[1.5rem] border border-neutral-100 bg-neutral-50 p-6 transition duration-300 hover:-translate-y-1 hover:border-mkt-accent-light/30 hover:bg-white hover:shadow-xl hover:shadow-mkt-accent/10"
             >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[mkt-accent] text-white">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-mkt-accent text-white">
                 <action.icon className="h-5 w-5" />
               </div>
               <h2 className="mt-5 text-lg font-black text-neutral-900">{action.title}</h2>
@@ -123,7 +127,7 @@ export default function AyudaPage() {
       <section className="bg-neutral-50 py-20 lg:py-28">
         <div className="mx-auto max-w-5xl px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[mkt-accent] text-white">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-mkt-accent text-white">
               <CircleHelp className="h-7 w-7" />
             </div>
             <h2 className="mt-5 text-3xl font-black tracking-tight text-neutral-900 sm:text-4xl">
@@ -135,7 +139,7 @@ export default function AyudaPage() {
             {faqGroups.map((group) => (
               <div key={group.title} className="rounded-[1.75rem] bg-white p-5 shadow-sm ring-1 ring-neutral-100 sm:p-7">
                 <div className="mb-5 flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[mkt-accent-light/10] text-[mkt-accent]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-mkt-accent-light/10 text-mkt-accent">
                     <group.icon className="h-5 w-5" />
                   </div>
                   <h3 className="text-xl font-black text-neutral-900">{group.title}</h3>
@@ -145,7 +149,7 @@ export default function AyudaPage() {
                     <details key={item.q} className="group py-4">
                       <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-left text-base font-black text-neutral-800">
                         {item.q}
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-[mkt-accent] transition group-open:rotate-45">
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-mkt-accent transition group-open:rotate-45">
                           +
                         </span>
                       </summary>
@@ -161,11 +165,11 @@ export default function AyudaPage() {
 
       <MarketingCtaBand
         eyebrow="Contacto"
-        title="Si no encuentras la respuesta, escribenos."
+        title="Si no encuentras la respuesta, escríbenos."
       >
         <a
           href="mailto:soporte@toke.app"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-black text-[mkt-accent] shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
+          className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-black text-mkt-accent shadow-lg shadow-black/10 transition-transform duration-200 hover:scale-[1.03]"
         >
           <MessageCircle className="h-4 w-4" />
           Contactar soporte
