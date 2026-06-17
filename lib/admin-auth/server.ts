@@ -2,68 +2,32 @@ import 'server-only'
 
 import { cache } from 'react'
 import { cookies } from 'next/headers'
-import { ADMIN_COOKIE_NAMES, getServerBackendUrl } from '@/lib/admin-auth/config'
+import { ADMIN_COOKIE_NAMES } from '@/lib/admin-auth/config'
+import { obtenerSesionAdmin } from '@/lib/admin-auth/service'
+import type { AdminSessionUser } from '@/lib/admin-auth/repository'
 
-export type AdminSessionUser = {
-  id: string
-  authUserId: string
-  email: string
-  nombres: string
-  apellidos: string
-  nombreCompleto: string
-  rol: 'admin'
-  activo: boolean
-  ultimoIngreso: string | null
-}
+export type { AdminSessionUser }
 
-type CurrentSessionResponse = {
-  usuario: AdminSessionUser
-  autenticado: boolean
-  refrescada: boolean
-}
-
-function buildAdminCookieHeader(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  const accessToken = cookieStore.get(ADMIN_COOKIE_NAMES.access)?.value
-  const refreshToken = cookieStore.get(ADMIN_COOKIE_NAMES.refresh)?.value
-
-  const items = [
-    accessToken ? `${ADMIN_COOKIE_NAMES.access}=${accessToken}` : null,
-    refreshToken ? `${ADMIN_COOKIE_NAMES.refresh}=${refreshToken}` : null,
-  ].filter(Boolean)
-
-  return items.join('; ')
-}
-
-// React.cache() deduplicates calls within the same RSC render pass, so
-// layout.tsx and page.tsx can both call getAdminSession() without triggering
-// two network requests to the backend.
-export const getAdminSession = cache(async () => {
+// React.cache() deduplica la llamada dentro del mismo render RSC, así que
+// layout.tsx y page.tsx pueden llamar getAdminSession() sin disparar dos
+// validaciones contra InsForge.
+//
+// Solo valida y devuelve el usuario admin (o null). NO persiste tokens
+// refrescados: un Server Component no puede escribir cookies. El refresh con
+// persistencia ocurre en el route handler GET /api/admin/sessions/current y
+// al iniciar sesión.
+export const getAdminSession = cache(async (): Promise<AdminSessionUser | null> => {
   const cookieStore = await cookies()
-  const cookieHeader = buildAdminCookieHeader(cookieStore)
+  const accessToken = cookieStore.get(ADMIN_COOKIE_NAMES.access)?.value ?? null
+  const refreshToken = cookieStore.get(ADMIN_COOKIE_NAMES.refresh)?.value ?? null
 
-  if (!cookieHeader) {
+  if (!accessToken && !refreshToken) {
     return null
   }
 
   try {
-    const response = await fetch(`${getServerBackendUrl()}/api/admin/sessions/current`, {
-      method: 'GET',
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: 'no-store',
-    })
-
-    if (!response.ok) {
-      return null
-    }
-
-    const payload = (await response.json()) as {
-      ok: boolean
-      datos?: CurrentSessionResponse
-    }
-
-    return payload.datos?.usuario ?? null
+    const session = await obtenerSesionAdmin({ accessToken, refreshToken })
+    return session.usuario
   } catch {
     return null
   }

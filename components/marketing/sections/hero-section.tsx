@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { GooglePlayIcon, AppleIcon } from '@/components/marketing/store-icons'
+import type { LandingSettings } from '@/lib/landing-settings'
 
 const wavePatternStyle = {
   backgroundImage: `url("data:image/svg+xml,%3Csvg width='120' height='20' viewBox='0 0 120 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q 30 0, 60 10 T 120 10' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")`,
@@ -7,9 +8,16 @@ const wavePatternStyle = {
   backgroundRepeat: 'repeat',
 } as const
 
-export function HeroSection() {
+function splitTitle(title: string) {
+  return title.split('\n').filter(Boolean)
+}
+
+export function HeroSection({ settings }: { settings: LandingSettings }) {
+  const heroTitleLines = splitTitle(settings.heroTitle)
+  const heroBackground = `linear-gradient(135deg, color-mix(in srgb, ${settings.brandColor} 74%, white), ${settings.brandColor}, color-mix(in srgb, ${settings.brandColor} 80%, #111827))`
+
   return (
-    <section className="relative z-30 min-h-[90vh] flex items-center overflow-x-clip overflow-y-visible bg-gradient-to-br from-mkt-accent-light via-mkt-accent to-mkt-accent-light hero-gradient-shift pt-28 pb-20 lg:pt-36 lg:pb-28">
+    <section className="relative z-30 min-h-[90vh] flex items-center overflow-x-clip overflow-y-visible hero-gradient-shift pt-28 pb-20 lg:pt-36 lg:pb-28" style={{ background: heroBackground }}>
       {/* Wavy pattern background */}
       <div className="absolute inset-0 overflow-hidden">
         <div 
@@ -30,27 +38,28 @@ export function HeroSection() {
           {/* Copy column */}
           <div className="flex-1 max-w-xl lg:max-w-[42rem] lg:pl-8 xl:pl-12">
             <h1 className="mt-10 text-3xl font-bold leading-[1.1] text-white text-shimmer sm:text-4xl lg:mt-0 lg:text-[52px] lg:leading-[1.2]">
-              La app para el
-              <br />
-              <span className="lg:whitespace-nowrap">mantenimiento de tu</span>
-              <br />
-              hogar
+              {heroTitleLines.map((line, index) => (
+                <span key={`${line}-${index}`} className={index === 1 ? 'lg:whitespace-nowrap' : undefined}>
+                  {index > 0 && <br />}
+                  {line}
+                </span>
+              ))}
             </h1>
 
             <p className="mx-auto mt-6 max-w-lg text-lg font-normal leading-relaxed text-white/95 sm:text-xl lg:mx-0 lg:max-w-[30rem] lg:text-[26px] lg:leading-[1.25]">
-              <strong className="font-bold text-white">Toke+</strong> te conecta con plomeros, electricistas, herreros, albañiles, jardineros, fleteros y más...
+              {settings.heroSubtitle}
             </p>
 
             <div className="hero-store-buttons mt-10 flex items-center justify-center gap-4 lg:justify-start">
               <a
-                href="#descargar"
+                href={settings.androidUrl}
                 className="inline-flex items-center justify-center gap-3 rounded-full border-2 border-white px-6 py-3.5 text-base font-bold text-white transition-all duration-300 hover:bg-white hover:text-mkt-accent sm:px-8"
               >
                 <GooglePlayIcon className="h-5 w-5 mr-1" />
                 Google Play
               </a>
               <a
-                href="#descargar"
+                href={settings.iosUrl}
                 className="inline-flex items-center justify-center gap-3 rounded-full border-2 border-white px-6 py-3.5 text-base font-bold text-white transition-all duration-300 hover:bg-white hover:text-mkt-accent sm:px-8"
               >
                 <AppleIcon className="h-6 w-6" />
@@ -67,7 +76,7 @@ export function HeroSection() {
               
               {/* Resplandor de contorno intenso */}
               <Image
-                src="/hero-mockup.webp"
+                src={settings.heroImageUrl}
                 alt="App toke+ mostrando servicios"
                 width={290}
                 height={570}

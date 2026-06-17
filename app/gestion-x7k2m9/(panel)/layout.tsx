@@ -1,0 +1,22 @@
+import { redirect } from 'next/navigation'
+import { AdminSidebar } from '@/components/admin/sidebar'
+import { getAdminSession } from '@/lib/admin-auth/server'
+
+export default async function AdministracionLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const admin = await getAdminSession()
+
+  if (!admin) {
+    redirect('/gestion-x7k2m9/iniciar-sesion')
+  }
+
+  return (
+    <div className="flex min-h-screen bg-neutral-50/50">
+      <AdminSidebar userName={admin.nombreCompleto} />
+      <main id="main-content" className="ml-64 flex-1 p-8">{children}</main>
+    </div>
+  )
+}

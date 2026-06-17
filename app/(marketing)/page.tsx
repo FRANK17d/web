@@ -9,6 +9,7 @@ import {
   ProfessionalsSection,
   DownloadCtaSection,
 } from '@/components/marketing/sections'
+import { getLandingSettings } from '@/lib/landing-settings'
 
 export const metadata: Metadata = {
   title: 'toke+ — Servicios para el hogar a un toque',
@@ -71,21 +72,23 @@ const jsonLd = {
   },
 }
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getLandingSettings()
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <HeroSection />
+      <HeroSection settings={settings} />
       <ProblemSection />
       <ServicesSection />
       <HowItWorksSection />
       <FeaturesSection />
       <StepsSection />
       <ProfessionalsSection />
-      <DownloadCtaSection />
+      <DownloadCtaSection settings={settings} />
     </>
   )
 }

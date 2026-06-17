@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react'
 import { LogOut } from 'lucide-react'
 import { callAdminApi } from '@/lib/admin-auth/browser'
+import { ADMIN_LOGIN_PATH } from '@/lib/admin-auth/config'
 import { FullPageLoader } from '@/components/full-page-loader'
 
 export function AdminLogoutButton() {
@@ -22,32 +23,36 @@ export function AdminLogoutButton() {
         return
       }
 
-      // Hard navigation to clear any cached RSC state and stale cookies
-      window.location.href = '/administracion/iniciar-sesion'
+      // Navegación dura para limpiar estado RSC cacheado y cookies viejas.
+      window.location.href = ADMIN_LOGIN_PATH
     })
   }
 
   return (
     <>
       {isPending && <FullPageLoader label="Cerrando sesión..." />}
-      
-      <div className="relative">
-      <button
-        type="button"
-        onClick={handleLogout}
-        disabled={isPending}
-        className="rounded-lg p-2 text-surface-400 transition-colors hover:bg-danger-50 hover:text-danger-500 disabled:cursor-not-allowed disabled:opacity-70"
-        title="Cerrar sesión"
-      >
-        <LogOut className="h-4 w-4" />
-      </button>
 
-      {error ? (
-        <div className="absolute bottom-full right-0 mb-2 w-64 rounded-xl border border-danger-500/20 bg-danger-50 px-3 py-2 text-xs text-danger-700 shadow-lg">
-          {error}
-        </div>
-      ) : null}
-    </div>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={handleLogout}
+          disabled={isPending}
+          className="rounded-lg p-2 text-surface-400 transition-colors hover:bg-danger-50 hover:text-danger-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger-500/40 disabled:cursor-not-allowed disabled:opacity-70 motion-reduce:transition-none"
+          aria-label="Cerrar sesión"
+          title="Cerrar sesión"
+        >
+          <LogOut className="h-4 w-4" aria-hidden="true" />
+        </button>
+
+        {error ? (
+          <div
+            role="alert"
+            className="absolute bottom-full right-0 mb-2 w-64 rounded-xl border border-danger-500/20 bg-danger-50 px-3 py-2 text-xs text-danger-700 shadow-lg"
+          >
+            {error}
+          </div>
+        ) : null}
+      </div>
     </>
   )
 }

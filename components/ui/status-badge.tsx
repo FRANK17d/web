@@ -1,6 +1,7 @@
 const STATUS_STYLES: Record<string, string> = {
   // Verification / technician
   pending: 'bg-warning-50 text-warning-700',
+  verified: 'bg-success-50 text-success-700',
   approved: 'bg-success-50 text-success-700',
   rejected: 'bg-danger-50 text-danger-700',
   suspended: 'bg-surface-200 text-surface-700',
@@ -9,6 +10,9 @@ const STATUS_STYLES: Record<string, string> = {
   in_progress: 'bg-brand-100 text-brand-800',
   completed: 'bg-success-50 text-success-700',
   cancelled: 'bg-danger-50 text-danger-700',
+  // Requests
+  pending_review: 'bg-warning-50 text-warning-700',
+  assigned: 'bg-brand-50 text-brand-700',
   // Disputes
   open: 'bg-warning-50 text-warning-700',
   under_review: 'bg-brand-50 text-brand-700',
@@ -24,6 +28,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 const LABEL_MAP: Record<string, string> = {
   pending: 'Pendiente',
+  verified: 'Verificado',
   approved: 'Aprobado',
   rejected: 'Rechazado',
   suspended: 'Suspendido',
@@ -31,6 +36,8 @@ const LABEL_MAP: Record<string, string> = {
   in_progress: 'En curso',
   completed: 'Completada',
   cancelled: 'Cancelada',
+  pending_review: 'En revisión',
+  assigned: 'Asignado',
   open: 'Abierta',
   under_review: 'En revisión',
   resolved: 'Resuelta',
