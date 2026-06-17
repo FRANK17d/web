@@ -1,55 +1,52 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-
-const ADMIN_ACCESS_COOKIE = 'maestroya_admin_access_token'
-const ADMIN_REFRESH_COOKIE = 'maestroya_admin_refresh_token'
-const LOGIN_PATH = '/administracion/iniciar-sesion'
+import {
+  ADMIN_BASE_PATH,
+  ADMIN_COOKIE_NAMES,
+  ADMIN_LOGIN_PATH,
+  ADMIN_RECOVERY_PATH,
+} from '@/lib/admin-auth/config'
 
 /**
- * Optimistic auth check at the edge.
+ * Chequeo optimista de auth en el edge.
  *
- * This does NOT validate tokens (no DB/network call). It only checks
- * whether at least one auth cookie exists. If neither cookie is
- * present the user is guaranteed unauthenticated and we redirect
- * immediately — avoiding the full RSC render.
+ * NO valida tokens (sin llamadas a red/DB). Solo verifica si existe al menos
+ * una cookie de sesión. Si no hay ninguna, el usuario está garantizado sin
+ * autenticar y redirigimos de inmediato — evitando el render RSC completo.
  *
- * Real validation still happens server-side in the layout via
- * getAdminSession().
+ * La validación real ocurre del lado del servidor en el layout vía
+ * getAdminSession() (que confirma rol admin activo contra InsForge).
  */
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ── Admin panel routes (excluding login & password-reset pages) ──
+  const isLoginRoute =
+    pathname === ADMIN_LOGIN_PATH || pathname === `${ADMIN_LOGIN_PATH}/`
+  const isRecoveryRoute = pathname.startsWith(ADMIN_RECOVERY_PATH)
+
+  const hasSession =
+    request.cookies.has(ADMIN_COOKIE_NAMES.access) ||
+    request.cookies.has(ADMIN_COOKIE_NAMES.refresh)
+
+  // ── Rutas del panel (excepto login y recuperación) ──
   const isAdminPanel =
-    pathname.startsWith('/administracion') &&
-    pathname !== LOGIN_PATH &&
-    !pathname.startsWith('/administracion/iniciar-sesion') &&
-    !pathname.startsWith('/administracion/olvide-mi-contrasena')
+    pathname.startsWith(ADMIN_BASE_PATH) && !isLoginRoute && !isRecoveryRoute
 
-  if (isAdminPanel) {
-    const hasAccess = request.cookies.has(ADMIN_ACCESS_COOKIE)
-    const hasRefresh = request.cookies.has(ADMIN_REFRESH_COOKIE)
-
-    if (!hasAccess && !hasRefresh) {
-      const loginUrl = new URL(LOGIN_PATH, request.url)
-      loginUrl.searchParams.set('redirect', pathname)
-      return NextResponse.redirect(loginUrl)
-    }
+  if (isAdminPanel && !hasSession) {
+    const loginUrl = new URL(ADMIN_LOGIN_PATH, request.url)
+    loginUrl.searchParams.set('redireccion', pathname)
+    return NextResponse.redirect(loginUrl)
   }
 
-  // ── Logged-in users hitting the login page → redirect to dashboard ──
-  if (pathname === LOGIN_PATH || pathname === '/administracion/iniciar-sesion/') {
-    const hasAccess = request.cookies.has(ADMIN_ACCESS_COOKIE)
-    const hasRefresh = request.cookies.has(ADMIN_REFRESH_COOKIE)
-
-    if (hasAccess || hasRefresh) {
-      return NextResponse.redirect(new URL('/administracion', request.url))
-    }
+  // ── Usuario ya logueado entrando al login → al panel ──
+  if (isLoginRoute && hasSession) {
+    return NextResponse.redirect(new URL(ADMIN_BASE_PATH, request.url))
   }
 
   return NextResponse.next()
 }
 
 export const config = {
-  matcher: ['/administracion/:path*'],
+  // El matcher debe ser estático. Si cambias ADMIN_BASE_PATH, actualiza esto.
+  matcher: ['/gestion-x7k2m9/:path*'],
 }

@@ -51,7 +51,17 @@ const socials = [
   },
 ]
 
-export function MarketingFooter() {
+export function MarketingFooter({
+  androidUrl = '#',
+  brandColor,
+  iosUrl = '#',
+  logoUrl,
+}: {
+  androidUrl?: string
+  brandColor?: string
+  iosUrl?: string
+  logoUrl?: string
+}) {
   return (
     <footer className="bg-neutral-900">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 py-14 lg:py-16">
@@ -59,8 +69,8 @@ export function MarketingFooter() {
 
           {/* Column 1 — Brand + Address */}
           <div>
-            <TokeLogo size="lg" variant="white" />
-            <div className="mt-6 space-y-4 border-l-2 border-mkt-accent-light pl-4">
+            <TokeLogo size="lg" variant="white" src={logoUrl || undefined} />
+            <div className="mt-6 space-y-4 border-l-2 border-mkt-accent-light pl-4" style={brandColor ? { borderColor: brandColor } : undefined}>
               <p className="text-sm leading-relaxed text-neutral-400">
                 <span className="font-semibold text-neutral-300">Dirección:</span> Trujillo, La Libertad, Perú.
               </p>
@@ -114,7 +124,7 @@ export function MarketingFooter() {
 
             {/* Store badges */}
             <div className="mt-8 flex flex-col gap-3">
-              <a href="#" className="block transition-opacity hover:opacity-80">
+              <a href={androidUrl} className="block transition-opacity hover:opacity-80">
                 <Image
                   src="/badge-google-play.webp"
                   alt="Descargar en Google Play"
@@ -124,7 +134,7 @@ export function MarketingFooter() {
                   style={{ width: 160, height: 'auto' }}
                 />
               </a>
-              <a href="#" className="block transition-opacity hover:opacity-80">
+              <a href={iosUrl} className="block transition-opacity hover:opacity-80">
                 <Image
                   src="/badge-app-store.webp"
                   alt="Descargar en App Store"

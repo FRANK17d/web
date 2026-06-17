@@ -1,4 +1,4 @@
-type BackendApiResult<T> = {
+type AdminApiResult<T> = {
   ok: boolean
   status: number
   data: T | null
@@ -6,11 +6,11 @@ type BackendApiResult<T> = {
 }
 
 /**
- * Calls the admin backend API through the Next.js proxy route handler
- * at /api/admin/[...path]. Requests stay same-origin so auth cookies
- * are set and sent reliably (no cross-origin cookie issues).
+ * Llama a los route handlers de auth admin en /api/admin/* (mismos-origen,
+ * implementados con Insforge del lado del servidor). Al ser same-origin las
+ * cookies de sesión se fijan y envían de forma confiable.
  */
-export async function callAdminApi<T>(path: string, init?: RequestInit): Promise<BackendApiResult<T>> {
+export async function callAdminApi<T>(path: string, init?: RequestInit): Promise<AdminApiResult<T>> {
   try {
     const response = await fetch(path, {
       ...init,
@@ -45,7 +45,7 @@ export async function callAdminApi<T>(path: string, init?: RequestInit): Promise
       ok: false,
       status: 0,
       data: null,
-      error: 'No se pudo conectar con el backend administrativo.',
+      error: 'No se pudo conectar con el servicio administrativo.',
     }
   }
 }

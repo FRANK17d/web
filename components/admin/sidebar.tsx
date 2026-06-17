@@ -8,6 +8,8 @@ import {
   Users,
   ShieldCheck,
   CalendarDays,
+  CreditCard,
+  Crown,
   Wrench as WrenchIcon,
   AlertTriangle,
   BarChart3,
@@ -16,14 +18,16 @@ import {
 import { AdminLogoutButton } from '@/components/admin/logout-button'
 
 const navItems = [
-  { href: '/administracion', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/administracion/usuarios', label: 'Usuarios', icon: Users },
-  { href: '/administracion/verificaciones', label: 'Verificaciones', icon: ShieldCheck },
-  { href: '/administracion/reservas', label: 'Reservas', icon: CalendarDays },
-  { href: '/administracion/servicios', label: 'Servicios', icon: WrenchIcon },
-  { href: '/administracion/disputas', label: 'Disputas', icon: AlertTriangle },
-  { href: '/administracion/reportes', label: 'Reportes', icon: BarChart3 },
-  { href: '/administracion/configuracion', label: 'Configuración', icon: Settings },
+  { href: '/gestion-x7k2m9', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/gestion-x7k2m9/usuarios', label: 'Usuarios', icon: Users },
+  { href: '/gestion-x7k2m9/verificaciones', label: 'Verificaciones', icon: ShieldCheck },
+  { href: '/gestion-x7k2m9/reservas', label: 'Pedidos', icon: CalendarDays },
+  { href: '/gestion-x7k2m9/servicios', label: 'Servicios', icon: WrenchIcon },
+  { href: '/gestion-x7k2m9/creditos', label: 'Créditos', icon: CreditCard },
+  { href: '/gestion-x7k2m9/tokepro', label: 'TokePro', icon: Crown },
+  { href: '/gestion-x7k2m9/disputas', label: 'Disputas', icon: AlertTriangle },
+  { href: '/gestion-x7k2m9/reportes', label: 'Reportes', icon: BarChart3 },
+  { href: '/gestion-x7k2m9/configuracion', label: 'Configuración', icon: Settings },
 ]
 
 export function AdminSidebar({ userName }: { userName: string }) {
@@ -52,7 +56,7 @@ export function AdminSidebar({ userName }: { userName: string }) {
           {navItems.map((item) => {
             const isActive =
               pathname === item.href ||
-              (item.href !== '/administracion' && pathname.startsWith(item.href))
+              (item.href !== '/gestion-x7k2m9' && pathname.startsWith(item.href))
             return (
               <li key={item.href}>
                 <Link

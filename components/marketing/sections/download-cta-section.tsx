@@ -3,6 +3,7 @@ import { TokeLogo } from '@/components/marketing/toke-logo'
 import { AnimateOnScroll } from '@/components/marketing/animate-on-scroll'
 import { GooglePlayIcon, AppleIcon } from '@/components/marketing/store-icons'
 import { Shield, Lock, CircleCheck } from 'lucide-react'
+import type { LandingSettings } from '@/lib/landing-settings'
 
 const trustBadges = [
   { icon: Shield, label: 'Seguro y confiable' },
@@ -10,9 +11,11 @@ const trustBadges = [
   { icon: CircleCheck, label: 'Rápido y fácil de usar' },
 ]
 
-export function DownloadCtaSection() {
+export function DownloadCtaSection({ settings }: { settings: LandingSettings }) {
+  const sectionBackground = `linear-gradient(135deg, color-mix(in srgb, ${settings.brandColor} 74%, white), ${settings.brandColor}, color-mix(in srgb, ${settings.brandColor} 80%, #111827))`
+
   return (
-    <section id="descargar" className="relative overflow-hidden bg-gradient-to-br from-mkt-accent-light via-mkt-accent to-mkt-accent-light hero-gradient-shift">
+    <section id="descargar" className="relative overflow-hidden hero-gradient-shift" style={{ background: sectionBackground }}>
       {/* Dot pattern — top right */}
       <div className="pointer-events-none absolute top-0 right-0 w-[200px] h-[200px] lg:w-[300px] lg:h-[300px] opacity-[0.12]">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle, white 1.5px, transparent 1.5px)', backgroundSize: '16px 16px' }} />
@@ -24,28 +27,27 @@ export function DownloadCtaSection() {
 
           {/* Left — Copy */}
           <AnimateOnScroll variant="fade-right" className="flex-1 text-center lg:text-left">
-            <TokeLogo size="md" variant="white" className="justify-center lg:justify-start" />
+            <TokeLogo size="md" variant="white" src={settings.logoUrl || undefined} className="justify-center lg:justify-start" />
 
             <h2 className="mt-5 text-3xl font-extrabold text-white sm:text-4xl lg:text-5xl leading-[1.1] tracking-tight">
               Descarga la app<br />y empieza hoy
             </h2>
 
             <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/85 sm:text-base lg:mx-0">
-              Disponible en Android y próximamente en iOS.
-              El servicio que necesitas, a un toque.
+              {settings.promoBanner}
             </p>
 
             {/* CTA Buttons */}
             <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
               <a
-                href="#"
+                href={settings.androidUrl}
                 className="cta-pulse group inline-flex items-center gap-2.5 rounded-full bg-white px-6 py-3 text-sm font-bold text-mkt-accent shadow-lg shadow-black/10 transition-all duration-200 hover:scale-[1.03] hover:shadow-xl active:scale-[0.97]"
               >
                 <GooglePlayIcon className="h-5 w-5" />
                 Google Play
               </a>
               <a
-                href="#"
+                href={settings.iosUrl}
                 className="group inline-flex items-center gap-2.5 rounded-full border-2 border-white/50 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/20 hover:border-white/70 hover:scale-[1.03] active:scale-[0.97]"
               >
                 <AppleIcon className="h-5 w-5" />

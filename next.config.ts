@@ -9,7 +9,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self'${isDev ? " 'unsafe-eval'" : ''} 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://images.unsplash.com;
+  img-src 'self' blob: data: https://images.unsplash.com https://*.insforge.app;
   font-src 'self';
   connect-src 'self';
   object-src 'none';
@@ -24,23 +24,9 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/administracion/olvide-mi-contraseña',
-        destination: '/administracion/olvide-mi-contrasena',
-        permanent: true,
-      },
-      {
-        source: '/admin/login',
-        destination: '/administracion/iniciar-sesion',
-        permanent: true,
-      },
-      {
-        source: '/admin/:path*',
-        destination: '/administracion/:path*',
-        permanent: true,
-      },
-      {
-        source: '/admin',
-        destination: '/administracion',
+        // Solo corrige la versión con tilde del slug actual hacia la canónica.
+        source: '/gestion-x7k2m9/olvide-mi-contraseña',
+        destination: '/gestion-x7k2m9/olvide-mi-contrasena',
         permanent: true,
       },
     ]
@@ -80,6 +66,10 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.insforge.app',
       },
     ],
   },

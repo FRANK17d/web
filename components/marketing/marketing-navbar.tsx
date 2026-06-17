@@ -12,7 +12,7 @@ const navLinks = [
   { href: '/servicios', label: 'Servicios' },
 ]
 
-export function MarketingNavbar() {
+export function MarketingNavbar({ brandColor, logoUrl }: { brandColor?: string; logoUrl?: string }) {
   const [open, setOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const isScrolledRef = useRef(false)
@@ -88,7 +88,7 @@ export function MarketingNavbar() {
             isScrolled ? 'lg:h-10' : 'lg:h-14'
           }`}
         >
-          <TokeLogo size='lg' variant="color" className="h-full w-auto transition-all duration-300 object-contain" />
+          <TokeLogo size='lg' variant="color" src={logoUrl || undefined} className="h-full w-auto transition-all duration-300 object-contain" />
         </Link>
 
         {/* Desktop links */}
@@ -112,6 +112,7 @@ export function MarketingNavbar() {
             className={`flex items-center gap-2 rounded-full bg-mkt-accent px-6 py-2 text-base font-bold text-white transition-all duration-300 hover:bg-mkt-accent-hover active:scale-[0.97] ${
               isScrolled ? 'lg:px-5 lg:py-1.5 lg:text-sm' : 'lg:px-6 lg:py-2 lg:text-base'
             }`}
+            style={brandColor ? { backgroundColor: brandColor } : undefined}
           >
             <span>Descargar la app</span>
             <Download
