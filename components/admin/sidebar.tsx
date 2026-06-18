@@ -25,7 +25,7 @@ const navItems = [
   { href: '/gestion-x7k2m9/servicios', label: 'Servicios', icon: WrenchIcon },
   { href: '/gestion-x7k2m9/creditos', label: 'Créditos', icon: CreditCard },
   { href: '/gestion-x7k2m9/tokepro', label: 'TokePro', icon: Crown },
-  { href: '/gestion-x7k2m9/disputas', label: 'Disputas', icon: AlertTriangle },
+  { href: '/gestion-x7k2m9/disputas', label: 'Soporte', icon: AlertTriangle },
   { href: '/gestion-x7k2m9/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/gestion-x7k2m9/configuracion', label: 'Configuración', icon: Settings },
 ]

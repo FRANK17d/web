@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { cookies } from 'next/headers'
 import { createInsforgeServerClient } from '@/lib/admin-auth/insforge'
 import { ADMIN_COOKIE_NAMES } from '@/lib/admin-auth/config'
+import { getAdminSession } from '@/lib/admin-auth/server'
 
 async function getAuthenticatedClient() {
   const cookieStore = await cookies()
@@ -144,6 +145,55 @@ export async function toggleUserActive(userId: string, active: boolean) {
     .eq('id', userId)
 
   if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9')
+  return { success: true }
+}
+
+export async function updateSupportTicketStatus(
+  ticketId: string,
+  status: 'open' | 'in_progress' | 'closed'
+) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('support_tickets')
+    .update({ status })
+    .eq('id', ticketId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/disputas')
+  revalidatePath('/gestion-x7k2m9')
+  return { success: true }
+}
+
+export async function replySupportTicket(formData: FormData) {
+  const ticketId = formString(formData, 'ticketId')
+  const body = formString(formData, 'body')
+
+  if (!ticketId) return { success: false, message: 'Ticket inválido.' }
+  if (!body) return { success: false, message: 'Escribe una respuesta.' }
+
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, message: 'Sesión admin inválida.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database.from('ticket_messages').insert([
+    {
+      ticket_id: ticketId,
+      sender_id: admin.id,
+      body,
+      is_admin: true,
+    },
+  ])
+
+  if (error) return { success: false, message: error.message }
+
+  await client.database
+    .from('support_tickets')
+    .update({ status: 'in_progress' })
+    .eq('id', ticketId)
+
+  revalidatePath('/gestion-x7k2m9/disputas')
+  revalidatePath(`/gestion-x7k2m9/disputas/${ticketId}`)
   revalidatePath('/gestion-x7k2m9')
   return { success: true }
 }
