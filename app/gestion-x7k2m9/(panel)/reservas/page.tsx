@@ -3,6 +3,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { DataTable, type Column } from '@/components/ui/data-table'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { RequestActions } from './request-actions'
+import Link from 'next/link'
 
 type Row = Awaited<ReturnType<typeof getServiceRequests>>[number]
 
@@ -56,8 +57,18 @@ const columns: Column<Row>[] = [
   {
     key: 'actions',
     header: '',
-    render: (r) =>
-      r.status === 'pending_review' ? <RequestActions requestId={r.id} title={r.title} /> : null,
+    className: 'min-w-[18rem]',
+    render: (r) => (
+      <div className="flex items-center gap-2">
+        <Link
+          href={`/gestion-x7k2m9/reservas/${r.id}`}
+          className="rounded-lg border border-neutral-200 px-3 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-50"
+        >
+          Ver detalle
+        </Link>
+        {r.status === 'pending_review' ? <RequestActions requestId={r.id} title={r.title} /> : null}
+      </div>
+    ),
   },
 ]
 

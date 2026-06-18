@@ -175,6 +175,33 @@ export type ServiceRequestRow = {
   client_name?: string
 }
 
+export type ServiceRequestDetailRow = ServiceRequestRow & {
+  address: string | null
+  image_urls: string[]
+  budget_min: number | null
+  budget_max: number | null
+  preferred_date: string | null
+  needs_invoice: boolean
+  latitude: number | null
+  longitude: number | null
+  assigned_technician_id: string | null
+  updated_at: string
+}
+
+export type RequestApplicationRow = {
+  application_id: string
+  technician_id: string
+  message: string | null
+  proposed_price: number | null
+  status: string
+  created_at: string
+  first_name: string | null
+  last_name: string | null
+  avatar_url: string | null
+  avg_rating: number | null
+  total_jobs_completed: number | null
+}
+
 type ServiceRequestQueryRow = {
   id: string
   title: string
@@ -235,6 +262,70 @@ export async function getServiceRequests(filters?: { status?: string }) {
   }) as ServiceRequestRow[]
 }
 
+export async function getServiceRequestDetail(requestId: string) {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('service_requests')
+    .select(
+      'id, title, description, status, category_id, district_id, created_at, updated_at, client_id, address, image_urls, budget_min, budget_max, preferred_date, needs_invoice, latitude, longitude, assigned_technician_id, service_categories(name, emoji), districts(name), profiles!service_requests_client_id_fkey(first_name, last_name)'
+    )
+    .eq('id', requestId)
+    .single()
+
+  if (error || !data) return null
+
+  const row = data as ServiceRequestQueryRow & {
+    address: string | null
+    image_urls: string[] | null
+    budget_min: number | null
+    budget_max: number | null
+    preferred_date: string | null
+    needs_invoice: boolean | null
+    latitude: number | null
+    longitude: number | null
+    assigned_technician_id: string | null
+    updated_at: string
+  }
+  const category = firstRelation(row.service_categories)
+  const district = firstRelation(row.districts)
+  const profile = firstRelation(row.profiles)
+
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    status: row.status,
+    category_id: row.category_id,
+    district_id: row.district_id,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    client_id: row.client_id,
+    category_name: category?.name ?? '',
+    category_emoji: category?.emoji ?? '',
+    district_name: district?.name ?? '',
+    client_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+    address: row.address,
+    image_urls: row.image_urls ?? [],
+    budget_min: row.budget_min,
+    budget_max: row.budget_max,
+    preferred_date: row.preferred_date,
+    needs_invoice: row.needs_invoice ?? false,
+    latitude: row.latitude,
+    longitude: row.longitude,
+    assigned_technician_id: row.assigned_technician_id,
+  } as ServiceRequestDetailRow
+}
+
+export async function getRequestApplications(requestId: string) {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database.rpc('get_request_applications', {
+    p_request_id: requestId,
+  })
+
+  if (error || !Array.isArray(data)) return []
+  return data as RequestApplicationRow[]
+}
+
 export async function reviewServiceRequest(requestId: string, approve: boolean, reason?: string) {
   const client = await getAuthenticatedClient()
   const { data, error } = await client.database.rpc('review_service_request', {
@@ -244,6 +335,152 @@ export async function reviewServiceRequest(requestId: string, approve: boolean, 
   })
   if (error) return { success: false, message: error.message }
   return (data as AdminRpcResult | null) ?? { success: true }
+}
+
+// ─── Support Tickets ──────────────────────────────────────────
+
+export type SupportTicketRow = {
+  id: string
+  user_id: string
+  subject: string
+  category: string | null
+  status: string
+  priority: string
+  created_at: string
+  updated_at: string
+  user_name: string
+  user_email: string | null
+}
+
+export type TicketMessageRow = {
+  id: string
+  ticket_id: string
+  sender_id: string
+  body: string
+  is_admin: boolean
+  created_at: string
+  sender_name: string
+  sender_email: string | null
+}
+
+type SupportTicketQueryRow = {
+  id: string
+  user_id: string
+  subject: string
+  category: string | null
+  status: string
+  priority: string
+  created_at: string
+  updated_at: string
+}
+
+type ProfileLookupRow = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  email: string | null
+}
+
+export async function getSupportTickets(filters?: { status?: string }) {
+  const client = await getAuthenticatedClient()
+  let query = client.database
+    .from('support_tickets')
+    .select('id, user_id, subject, category, status, priority, created_at, updated_at')
+    .order('updated_at', { ascending: false })
+    .limit(100)
+
+  if (filters?.status && filters.status !== 'all') {
+    query = query.eq('status', filters.status)
+  }
+
+  const { data, error } = await query
+  if (error) return []
+
+  const rows = (data ?? []) as SupportTicketQueryRow[]
+  const userIds = Array.from(new Set(rows.map((row) => row.user_id).filter(Boolean)))
+  const profilesById = new Map<string, ProfileLookupRow>()
+
+  if (userIds.length > 0) {
+    const { data: profiles } = await client.database
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', userIds)
+
+    for (const profile of (profiles ?? []) as ProfileLookupRow[]) {
+      profilesById.set(profile.id, profile)
+    }
+  }
+
+  return rows.map((row) => {
+    const profile = profilesById.get(row.user_id)
+    return {
+      ...row,
+      user_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Usuario',
+      user_email: profile?.email ?? null,
+    }
+  }) as SupportTicketRow[]
+}
+
+export async function getSupportTicketDetail(ticketId: string) {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('support_tickets')
+    .select('id, user_id, subject, category, status, priority, created_at, updated_at')
+    .eq('id', ticketId)
+    .single()
+
+  if (error || !data) return null
+
+  const row = data as SupportTicketQueryRow
+  const { data: profileData } = await client.database
+    .from('profiles')
+    .select('id, first_name, last_name, email')
+    .eq('id', row.user_id)
+    .maybeSingle()
+
+  const profile = profileData as ProfileLookupRow | null
+  return {
+    ...row,
+    user_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Usuario',
+    user_email: profile?.email ?? null,
+  } as SupportTicketRow
+}
+
+export async function getSupportTicketMessages(ticketId: string) {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('ticket_messages')
+    .select('id, ticket_id, sender_id, body, is_admin, created_at')
+    .eq('ticket_id', ticketId)
+    .order('created_at', { ascending: true })
+
+  if (error) return []
+
+  const rows = (data ?? []) as Omit<TicketMessageRow, 'sender_name' | 'sender_email'>[]
+  const senderIds = Array.from(new Set(rows.map((row) => row.sender_id).filter(Boolean)))
+  const profilesById = new Map<string, ProfileLookupRow>()
+
+  if (senderIds.length > 0) {
+    const { data: profiles } = await client.database
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .in('id', senderIds)
+
+    for (const profile of (profiles ?? []) as ProfileLookupRow[]) {
+      profilesById.set(profile.id, profile)
+    }
+  }
+
+  return rows.map((row) => {
+    const profile = profilesById.get(row.sender_id)
+    return {
+      ...row,
+      sender_name: row.is_admin
+        ? 'Soporte TOKE+'
+        : [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Usuario',
+      sender_email: profile?.email ?? null,
+    }
+  }) as TicketMessageRow[]
 }
 
 // ─── Technician Verifications ─────────────────────────────────
