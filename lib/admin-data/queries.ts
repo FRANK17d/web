@@ -5,10 +5,6 @@ import { cookies } from 'next/headers'
 import { createInsforgeServerClient } from '@/lib/admin-auth/insforge'
 import { ADMIN_COOKIE_NAMES } from '@/lib/admin-auth/config'
 
-function getAdminClient() {
-  return createInsforgeServerClient()
-}
-
 type Relation<T> = T | T[] | null
 
 function firstRelation<T>(value: Relation<T>) {
@@ -24,7 +20,7 @@ async function getAuthenticatedClient() {
 // ─── Dashboard KPIs ───────────────────────────────────────────
 
 export const getDashboardStats = cache(async () => {
-  const client = getAdminClient()
+  const client = await getAuthenticatedClient()
 
   const [users, requests, verifications, disputes, activeServices] = await Promise.all([
     client.database.from('profiles').select('*', { count: 'exact', head: true }),
@@ -66,8 +62,9 @@ export type UserRow = {
 }
 
 export async function getUsers(filters?: { role?: string; search?: string }) {
-  let query = getAdminClient()
-    .database.from('profiles')
+  const client = await getAuthenticatedClient()
+  let query = client.database
+    .from('profiles')
     .select('id, first_name, last_name, email, phone, role, is_active, created_at')
     .order('created_at', { ascending: false })
     .limit(100)
@@ -173,7 +170,18 @@ export type ServiceRequestRow = {
   category_emoji?: string
   district_name?: string
   client_name?: string
+  image_url?: string | null
 }
+
+export type ServiceRequestsPage = {
+  rows: ServiceRequestRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const PEDIDOS_PAGE_SIZE = 12
 
 export type ServiceRequestDetailRow = ServiceRequestRow & {
   address: string | null
@@ -216,31 +224,39 @@ type ServiceRequestQueryRow = {
   profiles: Relation<{ first_name: string | null; last_name: string | null }>
 }
 
-type AdminRpcResult = {
-  success?: boolean
-  message?: string
-  [key: string]: unknown
-}
+export async function getServiceRequests(filters?: {
+  status?: string
+  page?: number
+  pageSize?: number
+}): Promise<ServiceRequestsPage> {
+  const client = await getAuthenticatedClient()
 
-export async function getServiceRequests(filters?: { status?: string }) {
-  const client = getAdminClient()
+  const pageSize = filters?.pageSize ?? PEDIDOS_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
 
   let query = client.database
     .from('service_requests')
     .select(
-      'id, title, description, status, category_id, district_id, created_at, client_id, service_categories(name, emoji), districts(name), profiles!service_requests_client_id_fkey(first_name, last_name)'
+      'id, title, description, status, category_id, district_id, created_at, client_id, image_urls, service_categories(name, emoji), districts(name), profiles!service_requests_client_id_fkey(first_name, last_name)',
+      { count: 'exact' },
     )
     .order('created_at', { ascending: false })
-    .limit(100)
+    .range(from, to)
 
   if (filters?.status && filters.status !== 'all') {
     query = query.eq('status', filters.status)
   }
 
-  const { data, error } = await query
-  if (error) return []
+  const { data, error, count } = await query
+  if (error) {
+    return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  }
 
-  return ((data ?? []) as ServiceRequestQueryRow[]).map((r) => {
+  const rows = ((data ?? []) as (ServiceRequestQueryRow & {
+    image_urls: string[] | null
+  })[]).map((r) => {
     const category = firstRelation(r.service_categories)
     const district = firstRelation(r.districts)
     const profile = firstRelation(r.profiles)
@@ -258,8 +274,12 @@ export async function getServiceRequests(filters?: { status?: string }) {
       category_emoji: category?.emoji ?? '',
       district_name: district?.name ?? '',
       client_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+      image_url: r.image_urls?.[0] ?? null,
     }
   }) as ServiceRequestRow[]
+
+  const total = count ?? 0
+  return { rows, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) }
 }
 
 export async function getServiceRequestDetail(requestId: string) {
@@ -324,17 +344,6 @@ export async function getRequestApplications(requestId: string) {
 
   if (error || !Array.isArray(data)) return []
   return data as RequestApplicationRow[]
-}
-
-export async function reviewServiceRequest(requestId: string, approve: boolean, reason?: string) {
-  const client = await getAuthenticatedClient()
-  const { data, error } = await client.database.rpc('review_service_request', {
-    p_request_id: requestId,
-    p_approve: approve,
-    p_reason: reason ?? null,
-  })
-  if (error) return { success: false, message: error.message }
-  return (data as AdminRpcResult | null) ?? { success: true }
 }
 
 // ─── Support Tickets ──────────────────────────────────────────
@@ -609,7 +618,7 @@ export async function updateVerificationStatus(
   status: 'verified' | 'rejected',
   reason?: string
 ) {
-  const client = getAdminClient()
+  const client = await getAuthenticatedClient()
   const update: Record<string, unknown> = { verification_status: status }
   if (reason) update.rejection_reason = reason
   if (status === 'verified') update.verified_at = new Date().toISOString()
