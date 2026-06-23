@@ -95,6 +95,7 @@ export async function approveRequest(requestId: string) {
     p_reason: null,
   })
   if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/reservas')
   revalidatePath('/gestion-x7k2m9')
   return (data as AdminRpcResult | null) ?? { success: true }
 }
@@ -107,6 +108,7 @@ export async function rejectRequest(requestId: string, reason: string) {
     p_reason: reason,
   })
   if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/reservas')
   revalidatePath('/gestion-x7k2m9')
   return (data as AdminRpcResult | null) ?? { success: true }
 }

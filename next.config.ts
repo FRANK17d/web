@@ -9,7 +9,7 @@ const cspHeader = `
   default-src 'self';
   script-src 'self'${isDev ? " 'unsafe-eval'" : ''} 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://images.unsplash.com https://*.insforge.app;
+  img-src 'self' blob: data: https://images.unsplash.com https://*.insforge.app https://*.insforge.dev;
   font-src 'self';
   connect-src 'self';
   object-src 'none';

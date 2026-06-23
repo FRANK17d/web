@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/ui/page-header'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { getRequestApplications, getServiceRequestDetail } from '@/lib/admin-data/queries'
 import { RequestActions } from '../request-actions'
+import { RequestImageGallery } from '../request-image-gallery'
 
 const moneyFormatter = new Intl.NumberFormat('es-PE', {
   currency: 'PEN',
@@ -85,6 +86,11 @@ export default async function PedidoDetallePage({
               value={request.preferred_date ? dateFormatter.format(new Date(request.preferred_date)) : 'No indicada'}
             />
             <Detail label="Comprobante" value={request.needs_invoice ? 'Solicita factura/boleta' : 'No solicita'} />
+          </div>
+
+          <div className="mt-6 border-t border-slate/10 pt-5">
+            <h2 className="mb-3 text-lg font-bold text-ink">Fotos del pedido</h2>
+            <RequestImageGallery urls={request.image_urls} />
           </div>
 
           {request.status === 'pending_review' && (

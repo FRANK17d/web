@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   BarChart3,
   Settings,
+  X,
 } from 'lucide-react'
 import { AdminLogoutButton } from '@/components/admin/logout-button'
 
@@ -30,11 +31,23 @@ const navItems = [
   { href: '/gestion-x7k2m9/configuracion', label: 'Configuración', icon: Settings },
 ]
 
-export function AdminSidebar({ userName }: { userName: string }) {
+export function AdminSidebar({
+  userName,
+  open = false,
+  onClose,
+}: {
+  userName: string
+  open?: boolean
+  onClose?: () => void
+}) {
   const pathname = usePathname()
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-neutral-100 bg-white">
+    <aside
+      className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col border-r border-neutral-100 bg-white transition-transform duration-300 ease-out md:translate-x-0 ${
+        open ? 'translate-x-0 shadow-card' : '-translate-x-full'
+      }`}
+    >
       {/* Logo */}
       <div className="flex h-16 items-center gap-3 border-b border-neutral-100 px-6">
         <Image
@@ -48,6 +61,14 @@ export function AdminSidebar({ userName }: { userName: string }) {
         <span className="rounded-md bg-neutral-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-neutral-500">
           Admin
         </span>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar menú"
+          className="-mr-2 ml-auto rounded-lg p-1.5 text-neutral-500 transition-colors hover:bg-neutral-100 md:hidden"
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
 
       {/* Nav */}
