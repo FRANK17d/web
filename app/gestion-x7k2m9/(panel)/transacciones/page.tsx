@@ -4,6 +4,7 @@ import { DataTable, type Column } from '@/components/ui/data-table'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { FilterSelect } from '@/components/ui/filter-select'
 import { Pagination } from '@/components/ui/pagination'
+import { ExportCsvButton } from '@/components/admin/export-csv-button'
 
 const STATUS_LABELS: Record<string, string> = {
   pending: 'Pendiente',
@@ -85,6 +86,16 @@ export default async function TransaccionesPage({
   const rangeStart = total === 0 ? 0 : (page - 1) * pageSize + 1
   const rangeEnd = Math.min(page * pageSize, total)
 
+  const csvHeaders = ['Técnico', 'Tipo', 'Monto (PEN)', 'Créditos', 'Estado', 'Fecha']
+  const csvRows = rows.map((r) => [
+    r.technician_name,
+    KIND_LABELS[r.kind] ?? r.kind,
+    r.amount_pen.toFixed(2),
+    r.credits != null ? String(r.credits) : '—',
+    STATUS_LABELS[r.status] ?? r.status,
+    new Date(r.created_at).toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' }),
+  ])
+
   return (
     <div className="animate-fade-in motion-reduce:animate-none">
       <PageHeader
@@ -92,7 +103,10 @@ export default async function TransaccionesPage({
         title="Transacciones"
         description="Historial de pagos por compra de créditos y suscripciones TokePro."
         actions={
-          <FilterSelect paramName="status" label="Todos los estados" options={STATUS_OPTIONS} defaultValue={statusFilter ?? ''} />
+          <div className="flex items-center gap-3">
+            <ExportCsvButton headers={csvHeaders} rows={csvRows} filename="transacciones.csv" />
+            <FilterSelect paramName="status" label="Todos los estados" options={STATUS_OPTIONS} defaultValue={statusFilter ?? ''} />
+          </div>
         }
       />
 

@@ -479,3 +479,82 @@ export async function updateLandingSettings(formData: FormData) {
   revalidatePath('/')
   revalidatePath('/gestion-x7k2m9/configuracion')
 }
+
+// ─── Ajuste manual de créditos ────────────────────────────────
+
+export async function adjustCredits(formData: FormData) {
+  const technicianId = formString(formData, 'technicianId')
+  const amount = formNumber(formData, 'amount')
+  const reason = formString(formData, 'reason')
+
+  if (!technicianId) return { success: false, message: 'Técnico inválido.' }
+  if (amount === null || amount === 0) return { success: false, message: 'Ingresa un monto distinto de cero.' }
+  if (!reason) return { success: false, message: 'Ingresa un motivo para el ajuste.' }
+
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, message: 'Sesión admin inválida.' }
+
+  const client = await getAuthenticatedClient()
+
+  // Get current wallet
+  const { data: wallet, error: walletError } = await client.database
+    .from('credit_wallets')
+    .select('id, balance')
+    .eq('technician_id', technicianId)
+    .single()
+
+  if (walletError || !wallet) return { success: false, message: 'No se encontró la billetera del técnico.' }
+
+  const newBalance = wallet.balance + amount
+  if (newBalance < 0) return { success: false, message: 'El saldo resultante no puede ser negativo.' }
+
+  // Update balance
+  const { error: updateError } = await client.database
+    .from('credit_wallets')
+    .update({ balance: newBalance })
+    .eq('technician_id', technicianId)
+
+  if (updateError) return { success: false, message: updateError.message }
+
+  // Insert audit transaction
+  await client.database.from('credit_transactions').insert([
+    {
+      wallet_id: wallet.id,
+      type: amount > 0 ? 'admin_credit' : 'admin_debit',
+      amount: Math.abs(amount),
+      balance_after: newBalance,
+      description: `[Admin] ${reason}`,
+    },
+  ])
+
+  revalidatePath(`/gestion-x7k2m9/usuarios/${technicianId}`)
+  revalidatePath('/gestion-x7k2m9')
+  return { success: true, message: `Créditos ajustados correctamente. Nuevo saldo: ${newBalance}` }
+}
+
+// ─── Asignación manual de técnico ─────────────────────────────
+
+export async function assignTechnicianToRequest(requestId: string, technicianId: string) {
+  if (!requestId) return { success: false, message: 'Pedido inválido.' }
+  if (!technicianId) return { success: false, message: 'Técnico inválido.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('service_requests')
+    .update({ assigned_technician_id: technicianId, status: 'assigned' })
+    .eq('id', requestId)
+
+  if (error) return { success: false, message: error.message }
+
+  // Also update the application status
+  await client.database
+    .from('request_applications')
+    .update({ status: 'accepted' })
+    .eq('request_id', requestId)
+    .eq('technician_id', technicianId)
+
+  revalidatePath(`/gestion-x7k2m9/reservas/${requestId}`)
+  revalidatePath('/gestion-x7k2m9/reservas')
+  revalidatePath('/gestion-x7k2m9')
+  return { success: true }
+}

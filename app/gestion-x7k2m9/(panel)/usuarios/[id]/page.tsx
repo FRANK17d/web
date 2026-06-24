@@ -4,6 +4,7 @@ import { getUserDetail, getTechnicianDetail, getUserRecentOrders } from '@/lib/a
 import { PageHeader } from '@/components/ui/page-header'
 import { StatusBadge } from '@/components/ui/status-badge'
 import { ArrowLeft } from 'lucide-react'
+import { CreditAdjustForm } from './credit-adjust-form'
 
 export default async function UserDetailPage({
   params,
@@ -106,6 +107,8 @@ export default async function UserDetailPage({
               </div>
             )}
           </dl>
+
+          <CreditAdjustForm technicianId={id} />
         </div>
       )}
 

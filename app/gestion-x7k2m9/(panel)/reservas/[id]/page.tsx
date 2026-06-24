@@ -5,6 +5,7 @@ import { StatusBadge } from '@/components/ui/status-badge'
 import { getRequestApplications, getServiceRequestDetail } from '@/lib/admin-data/queries'
 import { RequestActions } from '../request-actions'
 import { RequestImageGallery } from '../request-image-gallery'
+import { AssignButton } from './assign-button'
 
 const moneyFormatter = new Intl.NumberFormat('es-PE', {
   currency: 'PEN',
@@ -130,6 +131,15 @@ export default async function PedidoDetallePage({
                   )}
                   {application.message && (
                     <p className="mt-2 text-sm leading-relaxed text-slate">{application.message}</p>
+                  )}
+                  {(request.status === 'open' || request.status === 'pending_review') && application.status === 'pending' && (
+                    <div className="mt-3 border-t border-slate/10 pt-3">
+                      <AssignButton
+                        requestId={request.id}
+                        technicianId={application.technician_id}
+                        technicianName={[application.first_name, application.last_name].filter(Boolean).join(' ') || 'Técnico'}
+                      />
+                    </div>
                   )}
                 </div>
               ))
