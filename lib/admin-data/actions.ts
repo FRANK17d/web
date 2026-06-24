@@ -437,6 +437,18 @@ export async function toggleSubscriptionPlan(planId: number, active: boolean) {
   return { success: true }
 }
 
+export async function toggleReviewVisibility(reviewId: string, visible: boolean) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('reviews')
+    .update({ is_visible: visible })
+    .eq('id', reviewId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/resenas')
+  return { success: true }
+}
+
 export async function updateLandingSettings(formData: FormData) {
   const client = await getAuthenticatedClient()
   const branding = {

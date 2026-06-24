@@ -14,6 +14,8 @@ import {
   AlertTriangle,
   BarChart3,
   Settings,
+  Star,
+  Receipt,
   X,
 } from 'lucide-react'
 import { AdminLogoutButton } from '@/components/admin/logout-button'
@@ -23,6 +25,8 @@ const navItems = [
   { href: '/gestion-x7k2m9/usuarios', label: 'Usuarios', icon: Users },
   { href: '/gestion-x7k2m9/verificaciones', label: 'Verificaciones', icon: ShieldCheck },
   { href: '/gestion-x7k2m9/reservas', label: 'Pedidos', icon: CalendarDays },
+  { href: '/gestion-x7k2m9/resenas', label: 'Reseñas', icon: Star },
+  { href: '/gestion-x7k2m9/transacciones', label: 'Transacciones', icon: Receipt },
   { href: '/gestion-x7k2m9/servicios', label: 'Servicios', icon: WrenchIcon },
   { href: '/gestion-x7k2m9/creditos', label: 'Créditos', icon: CreditCard },
   { href: '/gestion-x7k2m9/tokepro', label: 'TokePro', icon: Crown },

@@ -779,3 +779,311 @@ export async function getCreditStats() {
     wallets: arr.length,
   }
 }
+
+// ─── Reviews ──────────────────────────────────────────────────
+
+export type ReviewRow = {
+  id: string
+  client_name: string
+  technician_name: string
+  rating: number
+  comment: string | null
+  is_visible: boolean
+  created_at: string
+  service_title: string | null
+}
+
+type ReviewQueryRow = {
+  id: string
+  rating: number
+  comment: string | null
+  is_visible: boolean
+  created_at: string
+  client: Relation<{ first_name: string | null; last_name: string | null }>
+  technician: Relation<{ first_name: string | null; last_name: string | null }>
+  service_requests: Relation<{ title: string | null }>
+}
+
+export type ReviewsPage = {
+  rows: ReviewRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const REVIEWS_PAGE_SIZE = 12
+
+export async function getReviews(filters?: {
+  page?: number
+  pageSize?: number
+}): Promise<ReviewsPage> {
+  const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? REVIEWS_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const { data, error, count } = await client.database
+    .from('reviews')
+    .select(
+      'id, rating, comment, is_visible, created_at, client:profiles!reviews_client_id_fkey(first_name, last_name), technician:profiles!reviews_technician_id_fkey(first_name, last_name), service_requests(title)',
+      { count: 'exact' },
+    )
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) {
+    return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  }
+
+  const rows = ((data ?? []) as ReviewQueryRow[]).map((r) => {
+    const clientProfile = firstRelation(r.client)
+    const techProfile = firstRelation(r.technician)
+    const request = firstRelation(r.service_requests)
+
+    return {
+      id: r.id,
+      client_name: [clientProfile?.first_name, clientProfile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+      technician_name: [techProfile?.first_name, techProfile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+      rating: r.rating,
+      comment: r.comment,
+      is_visible: r.is_visible,
+      created_at: r.created_at,
+      service_title: request?.title ?? null,
+    }
+  }) as ReviewRow[]
+
+  const total = count ?? 0
+  return { rows, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) }
+}
+
+// ─── Payment Transactions ─────────────────────────────────────
+
+export type PaymentOrderRow = {
+  id: string
+  technician_name: string
+  kind: string
+  amount_pen: number
+  credits: number | null
+  status: string
+  created_at: string
+}
+
+type PaymentOrderQueryRow = {
+  id: string
+  kind: string
+  amount_pen: number
+  credits: number | null
+  status: string
+  created_at: string
+  profiles: Relation<{ first_name: string | null; last_name: string | null }>
+}
+
+export type PaymentOrdersPage = {
+  rows: PaymentOrderRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const PAYMENT_ORDERS_PAGE_SIZE = 12
+
+export async function getPaymentOrders(filters?: {
+  status?: string
+  page?: number
+  pageSize?: number
+}): Promise<PaymentOrdersPage> {
+  const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? PAYMENT_ORDERS_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let query = client.database
+    .from('payment_orders')
+    .select(
+      'id, kind, amount_pen, credits, status, created_at, profiles!payment_orders_technician_id_fkey(first_name, last_name)',
+      { count: 'exact' },
+    )
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (filters?.status && filters.status !== 'all') {
+    query = query.eq('status', filters.status)
+  }
+
+  const { data, error, count } = await query
+  if (error) {
+    return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  }
+
+  const rows = ((data ?? []) as PaymentOrderQueryRow[]).map((r) => {
+    const profile = firstRelation(r.profiles)
+    return {
+      id: r.id,
+      technician_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+      kind: r.kind,
+      amount_pen: r.amount_pen,
+      credits: r.credits,
+      status: r.status,
+      created_at: r.created_at,
+    }
+  }) as PaymentOrderRow[]
+
+  const total = count ?? 0
+  return { rows, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) }
+}
+
+// ─── Active TokePro Subscribers ───────────────────────────────
+
+export type SubscriberRow = {
+  id: string
+  technician_name: string
+  plan_name: string
+  amount_pen: number
+  created_at: string
+}
+
+type SubscriberQueryRow = {
+  id: string
+  amount_pen: number
+  created_at: string
+  profiles: Relation<{ first_name: string | null; last_name: string | null }>
+  subscription_plans: Relation<{ name: string | null }>
+}
+
+export async function getActiveSubscribers(): Promise<SubscriberRow[]> {
+  const client = await getAuthenticatedClient()
+
+  const { data, error } = await client.database
+    .from('payment_orders')
+    .select(
+      'id, amount_pen, created_at, profiles!payment_orders_technician_id_fkey(first_name, last_name), subscription_plans(name)',
+    )
+    .eq('kind', 'subscription')
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(200)
+
+  if (error) return []
+
+  return ((data ?? []) as SubscriberQueryRow[]).map((r) => {
+    const profile = firstRelation(r.profiles)
+    const plan = firstRelation(r.subscription_plans)
+    return {
+      id: r.id,
+      technician_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Sin nombre',
+      plan_name: plan?.name ?? 'Plan desconocido',
+      amount_pen: r.amount_pen,
+      created_at: r.created_at,
+    }
+  }) as SubscriberRow[]
+}
+
+// ─── User Detail ──────────────────────────────────────────────
+
+export type UserDetailRow = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  email: string | null
+  phone: string | null
+  role: string
+  is_active: boolean
+  created_at: string
+}
+
+export type TechnicianProfileDetail = {
+  verification_status: string
+  bio: string | null
+  district_name: string | null
+  credits_balance: number
+}
+
+export type UserRecentOrder = {
+  id: string
+  title: string
+  status: string
+  created_at: string
+  role_in_order: 'client' | 'technician'
+}
+
+export async function getUserDetail(userId: string): Promise<UserDetailRow | null> {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('profiles')
+    .select('id, first_name, last_name, email, phone, role, is_active, created_at')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error || !data) return null
+  return data as UserDetailRow
+}
+
+export async function getTechnicianDetail(userId: string): Promise<TechnicianProfileDetail | null> {
+  const client = await getAuthenticatedClient()
+
+  const { data: techData } = await client.database
+    .from('technician_profiles')
+    .select('verification_status, bio, districts(name)')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (!techData) return null
+
+  const row = techData as {
+    verification_status: string
+    bio: string | null
+    districts: Relation<{ name: string | null }>
+  }
+
+  const district = firstRelation(row.districts)
+
+  const { data: walletData } = await client.database
+    .from('credit_wallets')
+    .select('balance')
+    .eq('technician_id', userId)
+    .maybeSingle()
+
+  return {
+    verification_status: row.verification_status,
+    bio: row.bio,
+    district_name: district?.name ?? null,
+    credits_balance: (walletData as { balance: number } | null)?.balance ?? 0,
+  }
+}
+
+export async function getUserRecentOrders(userId: string): Promise<UserRecentOrder[]> {
+  const client = await getAuthenticatedClient()
+
+  const [clientOrders, techOrders] = await Promise.all([
+    client.database
+      .from('service_requests')
+      .select('id, title, status, created_at')
+      .eq('client_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(10),
+    client.database
+      .from('service_requests')
+      .select('id, title, status, created_at')
+      .eq('assigned_technician_id', userId)
+      .order('created_at', { ascending: false })
+      .limit(10),
+  ])
+
+  const orders: UserRecentOrder[] = []
+
+  for (const r of (clientOrders.data ?? []) as { id: string; title: string; status: string; created_at: string }[]) {
+    orders.push({ ...r, role_in_order: 'client' })
+  }
+  for (const r of (techOrders.data ?? []) as { id: string; title: string; status: string; created_at: string }[]) {
+    orders.push({ ...r, role_in_order: 'technician' })
+  }
+
+  orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  return orders.slice(0, 15)
+}
