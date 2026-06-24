@@ -5,7 +5,7 @@ import { StatusBadge } from '@/components/ui/status-badge'
 import { FilterSelect } from '@/components/ui/filter-select'
 import { Pagination } from '@/components/ui/pagination'
 import { RequestActions } from './request-actions'
-import { AutoRefresh } from './auto-refresh'
+import { AutoRefresh } from '@/components/ui/auto-refresh'
 import Link from 'next/link'
 
 const STATUS_LABELS: Record<string, string> = {

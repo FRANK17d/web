@@ -1,7 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 import Image from 'next/image'
 import { Menu } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/sidebar'
@@ -20,12 +19,6 @@ export function AdminShell({
   children: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
-  const pathname = usePathname()
-
-  // Cierra el drawer al navegar.
-  useEffect(() => {
-    setOpen(false)
-  }, [pathname])
 
   return (
     <div className="min-h-screen bg-neutral-50/50">
