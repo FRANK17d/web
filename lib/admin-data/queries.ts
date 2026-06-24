@@ -105,6 +105,41 @@ export async function getServiceCategories() {
   return (data ?? []) as ServiceCategoryRow[]
 }
 
+export async function getServiceCategoryById(categoryId: number) {
+  const client = await getAuthenticatedClient()
+  const { data } = await client.database
+    .from('service_categories')
+    .select('id, name, emoji, slug, is_active, created_at')
+    .eq('id', categoryId)
+    .maybeSingle()
+
+  return (data ?? null) as ServiceCategoryRow | null
+}
+
+// ─── Services (sub-servicios por categoría) ───────────────────
+
+export type ServiceItemRow = {
+  id: number
+  category_id: number
+  name: string
+  is_active: boolean
+  sort_order: number
+  created_at: string
+}
+
+export async function getServicesByCategory(categoryId: number) {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('services')
+    .select('id, category_id, name, is_active, sort_order, created_at')
+    .eq('category_id', categoryId)
+    .order('sort_order', { ascending: true })
+    .order('name', { ascending: true })
+
+  if (error) return []
+  return (data ?? []) as ServiceItemRow[]
+}
+
 // ─── Credit Packages ──────────────────────────────────────────
 
 export type CreditPackageRow = {
@@ -543,26 +578,50 @@ function verificationDocumentUrl(filePath: string) {
   return `/gestion-x7k2m9/verificaciones/documento?path=${encodeURIComponent(filePath)}`
 }
 
-export async function getTechnicianVerifications(filters?: { status?: string }) {
+export type TechnicianVerificationsPage = {
+  rows: TechnicianVerificationRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const VERIFICACIONES_PAGE_SIZE = 12
+
+export async function getTechnicianVerifications(filters?: {
+  status?: string
+  page?: number
+  pageSize?: number
+}): Promise<TechnicianVerificationsPage> {
   const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? VERIFICACIONES_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
 
   let query = client.database
     .from('technician_profiles')
     .select(
-      'id, verification_status, dni, bio, created_at, profiles(first_name, last_name, email, phone), districts(name)'
+      // FK hint explícito: technician_profiles tiene 2 FKs a profiles (id y
+      // verified_by); sin el hint el embed es ambiguo (PGRST201) y la query falla.
+      'id, verification_status, dni, bio, created_at, profiles!technician_profiles_id_fkey(first_name, last_name, email, phone), districts(name)',
+      { count: 'exact' },
     )
     .order('created_at', { ascending: false })
-    .limit(100)
+    .range(from, to)
 
   if (filters?.status && filters.status !== 'all') {
     query = query.eq('verification_status', filters.status)
   }
 
-  const { data, error } = await query
-  if (error) return []
+  const { data, error, count } = await query
+  if (error) {
+    return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  }
 
-  const rows = (data ?? []) as TechnicianVerificationQueryRow[]
-  const technicianIds = rows.map((r) => r.id)
+  const techRows = (data ?? []) as TechnicianVerificationQueryRow[]
+  const technicianIds = techRows.map((r) => r.id)
   const documentsByTechnician = new Map<string, VerificationDocumentRow[]>()
 
   if (technicianIds.length > 0) {
@@ -592,7 +651,7 @@ export async function getTechnicianVerifications(filters?: { status?: string }) 
     }
   }
 
-  return rows.map((r) => {
+  const rows = techRows.map((r) => {
     const profile = firstRelation(r.profiles)
     const district = firstRelation(r.districts)
 
@@ -611,6 +670,79 @@ export async function getTechnicianVerifications(filters?: { status?: string }) 
       documents: documentsByTechnician.get(r.id) ?? [],
     }
   }) as TechnicianVerificationRow[]
+
+  const total = count ?? 0
+  return {
+    rows,
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  }
+}
+
+export type TechnicianVerificationDetailRow = TechnicianVerificationRow & {
+  rejection_reason: string | null
+}
+
+export async function getTechnicianVerificationDetail(
+  techProfileId: string,
+): Promise<TechnicianVerificationDetailRow | null> {
+  const client = await getAuthenticatedClient()
+
+  const { data, error } = await client.database
+    .from('technician_profiles')
+    .select(
+      'id, verification_status, rejection_reason, dni, bio, created_at, profiles!technician_profiles_id_fkey(first_name, last_name, email, phone), districts(name)',
+    )
+    .eq('id', techProfileId)
+    .maybeSingle()
+
+  if (error || !data) return null
+
+  const row = data as TechnicianVerificationQueryRow & {
+    rejection_reason: string | null
+  }
+  const profile = firstRelation(row.profiles)
+  const district = firstRelation(row.districts)
+
+  const { data: docsData } = await client.database
+    .from('verification_documents')
+    .select('technician_id, doc_type, file_path, status, review_notes, created_at, reviewed_at')
+    .eq('technician_id', techProfileId)
+    .order('created_at', { ascending: false })
+
+  const seen = new Set<string>()
+  const documents: VerificationDocumentRow[] = []
+  for (const doc of (docsData ?? []) as VerificationDocumentQueryRow[]) {
+    if (seen.has(doc.doc_type)) continue
+    seen.add(doc.doc_type)
+    documents.push({
+      doc_type: doc.doc_type,
+      file_path: doc.file_path,
+      status: doc.status,
+      review_notes: doc.review_notes,
+      created_at: doc.created_at,
+      reviewed_at: doc.reviewed_at,
+      url: verificationDocumentUrl(doc.file_path),
+    })
+  }
+
+  return {
+    id: row.id,
+    user_id: row.id,
+    first_name: profile?.first_name ?? '',
+    last_name: profile?.last_name ?? '',
+    email: profile?.email ?? null,
+    phone: profile?.phone ?? null,
+    verification_status: row.verification_status,
+    dni_number: row.dni,
+    specialty: row.bio,
+    rejection_reason: row.rejection_reason,
+    created_at: row.created_at,
+    district_name: district?.name ?? '',
+    documents,
+  }
 }
 
 export async function updateVerificationStatus(

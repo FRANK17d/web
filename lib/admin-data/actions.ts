@@ -252,6 +252,72 @@ export async function toggleServiceCategory(categoryId: number, active: boolean)
   return { success: true }
 }
 
+// ─── Servicios (sub-servicios por categoría) ──────────────────
+
+function validateServiceInput(formData: FormData): { name: string } | { error: string } {
+  const name = String(formData.get('name') ?? '').trim()
+  if (name.length < 2) return { error: 'Ingresa un nombre válido para el servicio.' }
+  if (name.length > 120) return { error: 'El nombre es demasiado largo.' }
+  return { name }
+}
+
+export async function createService(formData: FormData) {
+  const categoryId = formInt(formData, 'category_id')
+  if (categoryId === null) return { success: false, message: 'Categoría inválida.' }
+
+  const input = validateServiceInput(formData)
+  if ('error' in input) return { success: false, message: input.error }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database.from('services').insert([
+    { category_id: categoryId, name: input.name, is_active: true },
+  ])
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath(`/gestion-x7k2m9/servicios/${categoryId}`)
+  return { success: true }
+}
+
+export async function updateService(formData: FormData) {
+  const id = formInt(formData, 'id')
+  const categoryId = formInt(formData, 'category_id')
+  if (id === null) return { success: false, message: 'Servicio inválido.' }
+
+  const input = validateServiceInput(formData)
+  if ('error' in input) return { success: false, message: input.error }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('services')
+    .update({ name: input.name })
+    .eq('id', id)
+
+  if (error) return { success: false, message: error.message }
+  if (categoryId !== null) revalidatePath(`/gestion-x7k2m9/servicios/${categoryId}`)
+  return { success: true }
+}
+
+export async function toggleService(id: number, active: boolean, categoryId: number) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('services')
+    .update({ is_active: active })
+    .eq('id', id)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath(`/gestion-x7k2m9/servicios/${categoryId}`)
+  return { success: true }
+}
+
+export async function deleteService(id: number, categoryId: number) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database.from('services').delete().eq('id', id)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath(`/gestion-x7k2m9/servicios/${categoryId}`)
+  return { success: true }
+}
+
 export async function createCreditPackage(formData: FormData) {
   const input = validateCreditPackageInput(formData)
   if ('error' in input) return { success: false, message: input.error }

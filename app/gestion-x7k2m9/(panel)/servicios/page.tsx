@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { getServiceCategories, type ServiceCategoryRow } from '@/lib/admin-data/queries'
 import { PageHeader } from '@/components/ui/page-header'
 import { DataTable, type Column } from '@/components/ui/data-table'
@@ -38,8 +39,18 @@ const columns: Column<ServiceCategoryRow>[] = [
   {
     key: 'actions',
     header: '',
-    className: 'min-w-80',
-    render: (r) => <CategoryActions category={r} />,
+    className: 'min-w-96',
+    render: (r) => (
+      <div className="flex flex-wrap items-center gap-2">
+        <Link
+          href={`/gestion-x7k2m9/servicios/${r.id}`}
+          className="rounded-lg bg-[#EE7070] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#d95f5f]"
+        >
+          Servicios
+        </Link>
+        <CategoryActions category={r} />
+      </div>
+    ),
   },
 ]
 

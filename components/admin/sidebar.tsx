@@ -82,6 +82,7 @@ export function AdminSidebar({
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  onClick={onClose}
                   className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'bg-[#EE7070] text-white shadow-md shadow-[#EE7070]/20'
