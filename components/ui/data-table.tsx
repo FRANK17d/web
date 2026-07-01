@@ -70,33 +70,33 @@ export function DataTable<T>({
       </div>
 
       {/* ── Tarjetas en móvil / pantallas pequeñas (< md) ── */}
-      <div className="space-y-3 md:hidden">
+      <div className="grid gap-3 md:hidden">
         {rows.map((row) => (
           <div
             key={keyExtractor(row)}
-            className="rounded-2xl border border-slate/10 bg-white p-4 shadow-card"
+            className="rounded-[1.35rem] border border-slate/10 bg-white p-4 shadow-card ring-1 ring-black/[0.01]"
           >
             {/* La primera columna actúa de "título" de la tarjeta */}
-            {first && <div className="text-ink">{first.render(row)}</div>}
+            {first && <div className="min-w-0 text-ink">{first.render(row)}</div>}
 
             {rest.length > 0 && (
-              <dl className="mt-3 space-y-2 border-t border-slate/10 pt-3">
+              <dl className="mt-3 grid gap-2 border-t border-slate/10 pt-3">
                 {rest.map((col) =>
                   col.header ? (
                     <div
                       key={col.key}
-                      className="flex items-start justify-between gap-3"
+                      className="rounded-xl bg-canvas/60 px-3 py-2"
                     >
-                      <dt className="shrink-0 text-xs font-bold uppercase tracking-eyebrow text-slate">
+                      <dt className="text-[10px] font-bold uppercase tracking-eyebrow text-slate">
                         {col.header}
                       </dt>
-                      <dd className="min-w-0 text-right text-sm text-ink">
+                      <dd className="mt-1 min-w-0 break-words text-sm text-ink">
                         {col.render(row)}
                       </dd>
                     </div>
                   ) : (
                     // Columnas sin encabezado (p.ej. acciones): fila a lo ancho.
-                    <div key={col.key} className="overflow-x-auto pt-1">
+                    <div key={col.key} className="overflow-x-auto rounded-xl bg-canvas/60 p-2">
                       {col.render(row)}
                     </div>
                   ),

@@ -57,7 +57,7 @@ export default async function AdministracionPage() {
           detail={`${credits.wallets} billeteras`}
         />
         <StatCard label="Servicios activos" value={stats.activeServices} icon={Wrench} detail="categorías" />
-        <StatCard label="Auditoría" value="—" icon={ClipboardCheck} detail="próximamente" />
+        <StatCard label="Auditoría" value={stats.auditEvents} icon={ClipboardCheck} detail="eventos registrados" />
       </div>
     </div>
   )

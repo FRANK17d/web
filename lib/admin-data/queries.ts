@@ -22,7 +22,7 @@ async function getAuthenticatedClient() {
 export const getDashboardStats = cache(async () => {
   const client = await getAuthenticatedClient()
 
-  const [users, requests, verifications, disputes, activeServices] = await Promise.all([
+  const [users, requests, verifications, disputes, activeServices, auditEvents] = await Promise.all([
     client.database.from('profiles').select('*', { count: 'exact', head: true }),
     client.database.from('service_requests').select('*', { count: 'exact', head: true }),
     client.database
@@ -37,6 +37,7 @@ export const getDashboardStats = cache(async () => {
       .from('service_categories')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true),
+    client.database.from('admin_audit_log').select('*', { count: 'exact', head: true }),
   ])
 
   return {
@@ -45,8 +46,92 @@ export const getDashboardStats = cache(async () => {
     pendingVerifications: verifications.count ?? 0,
     pendingModeration: disputes.count ?? 0,
     activeServices: activeServices.count ?? 0,
+    auditEvents: auditEvents.count ?? 0,
   }
 })
+
+// ─── Admin Audit Log ──────────────────────────────────────────
+
+export type AdminAuditLogRow = {
+  id: number
+  admin_id: string | null
+  admin_name: string
+  admin_email: string | null
+  action: string
+  target_type: string | null
+  target_id: string | null
+  details: Record<string, unknown>
+  ip_address: string | null
+  created_at: string
+}
+
+export type AdminAuditLogsPage = {
+  rows: AdminAuditLogRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+type AdminAuditLogQueryRow = {
+  id: number
+  admin_id: string | null
+  action: string
+  target_type: string | null
+  target_id: string | null
+  details: Record<string, unknown> | null
+  ip_address: string | null
+  created_at: string
+  profiles: Relation<{
+    first_name: string | null
+    last_name: string | null
+    email: string | null
+  }>
+}
+
+export const AUDIT_LOGS_PAGE_SIZE = 12
+
+export async function getAdminAuditLogs(filters?: {
+  page?: number
+  pageSize?: number
+}): Promise<AdminAuditLogsPage> {
+  const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? AUDIT_LOGS_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const { data, error, count } = await client.database
+    .from('admin_audit_log')
+    .select(
+      'id, admin_id, action, target_type, target_id, details, ip_address, created_at, profiles!admin_audit_log_admin_id_fkey(first_name, last_name, email)',
+      { count: 'exact' },
+    )
+    .order('created_at', { ascending: false })
+    .range(from, to)
+
+  if (error) return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+
+  const rows = ((data ?? []) as AdminAuditLogQueryRow[]).map((r) => {
+    const profile = firstRelation(r.profiles)
+    return {
+      id: r.id,
+      admin_id: r.admin_id,
+      admin_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Administrador',
+      admin_email: profile?.email ?? null,
+      action: r.action,
+      target_type: r.target_type,
+      target_id: r.target_id,
+      details: r.details ?? {},
+      ip_address: r.ip_address,
+      created_at: r.created_at,
+    }
+  })
+
+  const total = count ?? 0
+  return { rows, total, page, pageSize, totalPages: Math.max(1, Math.ceil(total / pageSize)) }
+}
 
 // ─── Users ────────────────────────────────────────────────────
 
@@ -94,6 +179,16 @@ export type ServiceCategoryRow = {
   created_at: string
 }
 
+export type ServiceCategoriesPage = {
+  rows: ServiceCategoryRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const SERVICE_CATEGORIES_PAGE_SIZE = 12
+
 export async function getServiceCategories() {
   const client = await getAuthenticatedClient()
   const { data, error } = await client.database
@@ -103,6 +198,34 @@ export async function getServiceCategories() {
 
   if (error) return []
   return (data ?? []) as ServiceCategoryRow[]
+}
+
+export async function getServiceCategoriesPage(filters?: {
+  page?: number
+  pageSize?: number
+}): Promise<ServiceCategoriesPage> {
+  const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? SERVICE_CATEGORIES_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const { data, error, count } = await client.database
+    .from('service_categories')
+    .select('id, name, emoji, slug, is_active, created_at', { count: 'exact' })
+    .order('name', { ascending: true })
+    .range(from, to)
+
+  if (error) return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  const total = count ?? 0
+  return {
+    rows: (data ?? []) as ServiceCategoryRow[],
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  }
 }
 
 export async function getServiceCategoryById(categoryId: number) {
@@ -127,6 +250,16 @@ export type ServiceItemRow = {
   created_at: string
 }
 
+export type ServicesByCategoryPage = {
+  rows: ServiceItemRow[]
+  total: number
+  page: number
+  pageSize: number
+  totalPages: number
+}
+
+export const SERVICES_BY_CATEGORY_PAGE_SIZE = 12
+
 export async function getServicesByCategory(categoryId: number) {
   const client = await getAuthenticatedClient()
   const { data, error } = await client.database
@@ -138,6 +271,36 @@ export async function getServicesByCategory(categoryId: number) {
 
   if (error) return []
   return (data ?? []) as ServiceItemRow[]
+}
+
+export async function getServicesByCategoryPage(
+  categoryId: number,
+  filters?: { page?: number; pageSize?: number },
+): Promise<ServicesByCategoryPage> {
+  const client = await getAuthenticatedClient()
+
+  const pageSize = filters?.pageSize ?? SERVICES_BY_CATEGORY_PAGE_SIZE
+  const page = Math.max(1, filters?.page ?? 1)
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const { data, error, count } = await client.database
+    .from('services')
+    .select('id, category_id, name, is_active, sort_order, created_at', { count: 'exact' })
+    .eq('category_id', categoryId)
+    .order('sort_order', { ascending: true })
+    .order('name', { ascending: true })
+    .range(from, to)
+
+  if (error) return { rows: [], total: 0, page, pageSize, totalPages: 0 }
+  const total = count ?? 0
+  return {
+    rows: (data ?? []) as ServiceItemRow[],
+    total,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(total / pageSize)),
+  }
 }
 
 // ─── Credit Packages ──────────────────────────────────────────

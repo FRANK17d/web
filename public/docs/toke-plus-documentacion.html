@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>TOKE+ Documentacion Integral</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #f5f1ea;
+      color: #182033;
+      font-family: Inter, Arial, Helvetica, sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.58;
+    }
+    .page {
+      background: #fffaf2;
+      min-height: 100vh;
+      padding: 0;
+    }
+    .cover {
+      min-height: 248mm;
+      padding: 26mm 20mm;
+      color: #fff;
+      background:
+        radial-gradient(circle at 84% 16%, rgba(255,255,255,.25), transparent 18%),
+        linear-gradient(135deg, #ee7070 0%, #d94f4f 46%, #1a2b4a 100%);
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .brand { font-size: 15pt; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+    .cover h1 { margin: 26mm 0 5mm; color: #fff; font-size: 42pt; line-height: .95; letter-spacing: -1.6pt; }
+    .cover .subtitle { max-width: 142mm; font-size: 16pt; color: rgba(255,255,255,.86); }
+    .cover .meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; margin-top: 18mm; }
+    .meta-card { border: 1px solid rgba(255,255,255,.26); border-radius: 16px; padding: 5mm; background: rgba(255,255,255,.11); }
+    .meta-card strong { display: block; font-size: 8pt; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.68); }
+    .meta-card span { display: block; margin-top: 1.5mm; font-size: 11pt; font-weight: 800; }
+    main { padding: 0 0 8mm; }
+    h1 { color: #c23b3b; font-size: 25pt; line-height: 1.05; letter-spacing: -0.8pt; margin: 0 0 8mm; page-break-after: avoid; }
+    h2 { color: #162033; font-size: 16pt; margin: 11mm 0 4mm; padding-top: 2mm; border-top: 2px solid #f0d7d7; page-break-after: avoid; }
+    h3 { color: #35415d; font-size: 12.5pt; margin: 7mm 0 2mm; page-break-after: avoid; }
+    p { margin: 0 0 3.2mm; }
+    ul { margin: 0 0 4mm 5mm; padding: 0 0 0 5mm; }
+    li { margin: 0 0 1.6mm; }
+    table { width: 100%; border-collapse: collapse; margin: 4mm 0 7mm; page-break-inside: avoid; font-size: 8.6pt; }
+    th { background: #1a2b4a; color: #fff; font-weight: 800; text-align: left; padding: 2.5mm; }
+    td { border: 1px solid #eadfce; padding: 2.3mm; vertical-align: top; }
+    tr:nth-child(even) td { background: #fff4f0; }
+    code { color: #b91c1c; background: #fff0f0; padding: 0.4mm 1mm; border-radius: 4px; font-family: Consolas, monospace; }
+    pre { background: #172033; color: #f8fafc; padding: 4mm; border-radius: 14px; font-size: 8.7pt; line-height: 1.45; white-space: pre-wrap; page-break-inside: avoid; }
+    pre code { color: inherit; background: transparent; padding: 0; }
+    strong { color: #101827; }
+    .content { padding: 0 0 0; }
+    .content > h1:first-child { display: none; }
+    .watermark { position: fixed; right: 13mm; bottom: 7mm; color: #9ca3af; font-size: 8pt; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <div>
+      <div class="brand">TOKE+</div>
+      <h1>Documentacion<br/>Integral</h1>
+      <p class="subtitle">Marketplace full-stack de servicios del hogar: app movil, web administrativa, backend, InsForge, pagos, IA, pruebas y despliegue.</p>
+      <div class="meta">
+        <div class="meta-card"><strong>Producto</strong><span>TOKE+</span></div>
+        <div class="meta-card"><strong>Version</strong><span>1.0 operativa</span></div>
+        <div class="meta-card"><strong>Fecha</strong><span>2026-07-01</span></div>
+      </div>
+    </div>
+    <div>Preparado para operacion, mantenimiento y presentacion tecnica.</div>
+  </section>
+  <main class="content"><h1>TOKE+ Documentacion Integral Del Proyecto</h1>
+<p><strong>Version:</strong> 1.0 operativa</p>
+<p><strong>Fecha:</strong> 2026-07-01</p>
+<p><strong>Producto:</strong> Marketplace de servicios del hogar para clientes, tecnicos y administradores.</p>
+<h2>1. Resumen Ejecutivo</h2>
+<p>TOKE+ es una plataforma digital que conecta clientes con tecnicos verificados para servicios del hogar. El cliente publica una necesidad, recibe postulaciones y elige con quien trabajar. El tecnico accede a pedidos reales por zona y categoria, usando creditos para postular y planes TokePro para potenciar su visibilidad.</p>
+<p>La solucion esta formada por una app movil Flutter, una web publica y administrativa en Next.js, un backend Express desplegado en Heroku y una base operativa InsForge con Auth, PostgreSQL, Storage, Functions, Realtime e IA mediante OpenRouter.</p>
+<p>El sistema ya cuenta con pruebas automatizadas, endpoints productivos verificados, correo de verificacion por SMTP, Mercado Pago en modo produccion y despliegue web/backend activo.</p>
+<h2>2. Objetivos Del Producto</h2>
+<ul>
+<li>Ayudar a clientes a encontrar tecnicos confiables por categoria y distrito.</li>
+<li>Dar a tecnicos acceso a pedidos reales, creditos, reputacion y beneficios TokePro.</li>
+<li>Permitir a administradores moderar, verificar, auditar y operar la plataforma.</li>
+<li>Centralizar datos, seguridad, archivos, IA y realtime en una arquitectura escalable.</li>
+</ul>
+<h2>3. Roles Y Permisos</h2>
+<table>
+<thead><tr><th>Rol</th><th>Descripcion</th><th>Funciones principales</th></tr></thead>
+<tbody>
+<tr><td>Cliente</td><td>Usuario que solicita servicios.</td><td>Registro, pedidos, fotos, postulantes, chat, resenas y soporte.</td></tr>
+<tr><td>Tecnico</td><td>Prestador verificado.</td><td>Registro tecnico, documentos, categorias, postulaciones, creditos, TokePro y chat.</td></tr>
+<tr><td>Administrador</td><td>Operador interno.</td><td>Usuarios, verificaciones, pedidos, soporte, servicios, pagos, auditorias y configuracion.</td></tr>
+</tbody></table>
+<h2>4. Arquitectura General</h2>
+<table>
+<thead><tr><th>Capa</th><th>Tecnologia</th><th>Responsabilidad</th></tr></thead>
+<tbody>
+<tr><td>App movil</td><td>Flutter, Dart, GoRouter, Riverpod</td><td>Experiencia cliente/tecnico.</td></tr>
+<tr><td>Web</td><td>Next.js 16, React 19, Tailwind 3.4</td><td>Landing publica y panel admin.</td></tr>
+<tr><td>Backend API</td><td>Node.js, Express 5, Zod</td><td>Pagos, IA alternativa, notificaciones y seguridad.</td></tr>
+<tr><td>BaaS</td><td>InsForge, PostgreSQL, Storage, Functions, Realtime</td><td>Auth, datos, archivos, RPCs, IA y eventos.</td></tr>
+<tr><td>Pagos</td><td>Mercado Pago</td><td>Creditos y TokePro.</td></tr>
+<tr><td>IA</td><td>OpenRouter via InsForge/Express</td><td>Clasificacion, soporte, moderacion y documentos.</td></tr>
+</tbody></table>
+<p>Flujo general:</p>
+<pre><code>Cliente/Tecnico -&gt; App Flutter -&gt; InsForge Auth/DB/Storage/Functions/Realtime
+Administrador -&gt; Web Next.js -&gt; InsForge Auth/DB
+Tecnico -&gt; Compra creditos/TokePro -&gt; Backend Express -&gt; Mercado Pago -&gt; Webhook -&gt; InsForge RPC</code></pre>
+<h2>5. Repositorios</h2>
+<table>
+<thead><tr><th>Repo</th><th>Ruta local</th><th>Proposito</th></tr></thead>
+<tbody>
+<tr><td>Mobile</td><td><code>mobile/</code></td><td>App Flutter para Android.</td></tr>
+<tr><td>Web</td><td><code>web/</code></td><td>Landing publica y admin Next.js.</td></tr>
+<tr><td>Backend</td><td><code>backend/</code></td><td>API Express para pagos, IA y notificaciones.</td></tr>
+<tr><td>DB/Migrations</td><td><code>db/migrations/</code></td><td>Migraciones SQL e infraestructura de datos.</td></tr>
+</tbody></table>
+<h2>6. App Movil Flutter</h2>
+<h3>Modulos principales</h3>
+<ul>
+<li>Autenticacion: email/password, OTP, recuperacion y Google OAuth.</li>
+<li>Cliente: home, descubrir, explorar, pedidos, postulantes, reservas y resenas.</li>
+<li>Tecnico: feed de pedidos, postulaciones, verificacion, creditos, TokePro y panel.</li>
+<li>Chat: conversaciones cliente-tecnico.</li>
+<li>Soporte: asistente IA y tickets humanos.</li>
+<li>Notificaciones: historial, realtime y tokens FCM.</li>
+<li>Perfil: datos personales, foto, biometria, contrasena y cuenta.</li>
+</ul>
+<h3>Funcionalidades recientes relevantes</h3>
+<ul>
+<li><code>Descubrir &gt; Pedidos &gt; Pedido</code> ahora abre una vista de detalle real.</li>
+<li>La vista de detalle muestra categoria, estado, distrito, presupuesto, fechas, fotos, descripcion, interesados y numero de pedido.</li>
+<li>Testimonios y casos de exito usan resenas reales desde <code>get_technician_reviews</code>.</li>
+<li>El parser de resenas acepta <code>request_order_number</code> numerico.</li>
+<li>El registro de token push acepta cualquier HTTP <code>2xx</code>, incluyendo <code>204</code>.</li>
+</ul>
+<h3>Comandos</h3>
+<pre><code>flutter pub get
+dart format lib test
+flutter analyze
+flutter test
+flutter run --profile -d &lt;device-id&gt; --no-resident</code></pre>
+<h2>7. Web Next.js</h2>
+<h3>Web publica</h3>
+<ul>
+<li>Landing principal.</li>
+<li>Paginas: Nosotros, Servicios, Ayuda, Privacidad y Terminos.</li>
+<li>SEO, sitemap, robots y metadata.</li>
+<li>Configuracion dinamica desde <code>app_settings</code>.</li>
+</ul>
+<h3>Panel administrativo</h3>
+<p>Ruta base: <code>/gestion-x7k2m9</code>.</p>
+<p>Secciones:</p>
+<ul>
+<li>Dashboard.</li>
+<li>Usuarios.</li>
+<li>Verificaciones.</li>
+<li>Reservas/pedidos.</li>
+<li>Disputas.</li>
+<li>Mensajes.</li>
+<li>Resenas.</li>
+<li>Servicios y categorias con paginacion.</li>
+<li>Creditos.</li>
+<li>TokePro.</li>
+<li>Suscriptores.</li>
+<li>Transacciones.</li>
+<li>Distritos.</li>
+<li>Configuracion.</li>
+<li>Auditorias administrativas.</li>
+</ul>
+<h3>Comandos</h3>
+<pre><code>npm install
+npm run lint
+npm run build</code></pre>
+<h2>8. Backend Express</h2>
+<p>Produccion:</p>
+<pre><code>https://tokeplus-api-439t8drp-fdd3e7290e72.herokuapp.com</code></pre>
+<h3>Endpoints principales</h3>
+<table>
+<thead><tr><th>Endpoint</th><th>Metodo</th><th>Funcion</th></tr></thead>
+<tbody>
+<tr><td><code>/health</code></td><td>GET</td><td>Estado de backend, DB, Mercado Pago e IA.</td></tr>
+<tr><td><code>/api/ai/suggest-category</code></td><td>POST</td><td>Sugiere categoria de pedido.</td></tr>
+<tr><td><code>/api/ai/analyze-document</code></td><td>POST</td><td>Analiza documentos de verificacion.</td></tr>
+<tr><td><code>/api/ai/moderate-request</code></td><td>POST</td><td>Modera pedidos.</td></tr>
+<tr><td><code>/api/ai/support</code></td><td>POST</td><td>Soporte IA.</td></tr>
+<tr><td><code>/api/payments/credits/checkout</code></td><td>POST</td><td>Checkout de creditos.</td></tr>
+<tr><td><code>/api/payments/tokepro/checkout</code></td><td>POST</td><td>Checkout/preapproval TokePro.</td></tr>
+<tr><td><code>/api/payments/mercadopago/webhook</code></td><td>POST</td><td>Webhook Mercado Pago.</td></tr>
+<tr><td><code>/api/payments/mercadopago/return</code></td><td>GET</td><td>Retorno/deep link mobile.</td></tr>
+<tr><td><code>/api/notifications/process</code></td><td>POST</td><td>Procesa notificaciones.</td></tr>
+</tbody></table>
+<h3>Seguridad backend</h3>
+<ul>
+<li>CORS restringido a <code>APP_ORIGIN</code> para web.</li>
+<li>Mobile permitido sin header <code>Origin</code>.</li>
+<li>Rate limit en IA y pagos.</li>
+<li>Validacion Zod.</li>
+<li>Logs estructurados con Pino.</li>
+<li>Webhook Mercado Pago firmado.</li>
+</ul>
+<h2>9. InsForge</h2>
+<p>Base URL:</p>
+<pre><code>https://439t8drp.us-east.insforge.app</code></pre>
+<p>Servicios activos:</p>
+<ul>
+<li>Auth con email/password, Google OAuth y verificacion por codigo.</li>
+<li>SMTP habilitado con Resend (<code>noreply@tokeplus.app</code>).</li>
+<li>PostgreSQL/PostgREST.</li>
+<li>Storage: <code>avatars</code>, <code>branding</code>, <code>request-photos</code>, <code>verification-docs</code>, <code>work-photos</code>.</li>
+<li>Function activa: <code>ai-gateway</code>.</li>
+<li>Realtime WebSocket.</li>
+</ul>
+<p>RPCs clave:</p>
+<table>
+<thead><tr><th>RPC</th><th>Uso</th></tr></thead>
+<tbody>
+<tr><td><code>get_public_requests</code></td><td>Lista pedidos publicos con detalle seguro.</td></tr>
+<tr><td><code>get_all_providers</code></td><td>Lista tecnicos verificados.</td></tr>
+<tr><td><code>get_technician_reviews</code></td><td>Resenas reales con datos del pedido.</td></tr>
+<tr><td><code>get_credit_transactions</code></td><td>Historial de creditos.</td></tr>
+<tr><td><code>submit_review</code></td><td>Crear/actualizar resena.</td></tr>
+<tr><td><code>create_client_profile</code></td><td>Completar perfil cliente.</td></tr>
+<tr><td><code>review_technician_verification</code></td><td>Aprobar/rechazar tecnico.</td></tr>
+<tr><td><code>fulfill_payment_order</code></td><td>Cumplir orden de Mercado Pago.</td></tr>
+</tbody></table>
+<h2>10. Modelo De Datos Principal</h2>
+<table>
+<thead><tr><th>Tabla</th><th>Funcion</th></tr></thead>
+<tbody>
+<tr><td><code>profiles</code></td><td>Perfil base de usuarios.</td></tr>
+<tr><td><code>technician_profiles</code></td><td>Perfil tecnico, rating, distrito y verificacion.</td></tr>
+<tr><td><code>service_categories</code></td><td>Categorias principales.</td></tr>
+<tr><td><code>services</code></td><td>Subservicios por categoria.</td></tr>
+<tr><td><code>technician_categories</code></td><td>Categorias ofrecidas por tecnico.</td></tr>
+<tr><td><code>service_requests</code></td><td>Pedidos publicados por clientes.</td></tr>
+<tr><td><code>applications</code></td><td>Postulaciones de tecnicos.</td></tr>
+<tr><td><code>reviews</code></td><td>Resenas cliente-tecnico.</td></tr>
+<tr><td><code>conversations</code></td><td>Conversaciones por pedido.</td></tr>
+<tr><td><code>messages</code></td><td>Mensajes.</td></tr>
+<tr><td><code>credit_wallets</code></td><td>Saldo de creditos.</td></tr>
+<tr><td><code>credit_transactions</code></td><td>Movimientos de creditos.</td></tr>
+<tr><td><code>payment_orders</code></td><td>Ordenes Mercado Pago.</td></tr>
+<tr><td><code>subscription_plans</code></td><td>Planes TokePro.</td></tr>
+<tr><td><code>subscriptions</code></td><td>Suscripciones.</td></tr>
+<tr><td><code>notifications</code></td><td>Notificaciones in-app.</td></tr>
+<tr><td><code>device_tokens</code></td><td>Tokens FCM.</td></tr>
+<tr><td><code>support_tickets</code></td><td>Tickets de soporte.</td></tr>
+<tr><td><code>verification_documents</code></td><td>Documentos privados.</td></tr>
+<tr><td><code>admin_audit_log</code></td><td>Auditoria de acciones admin.</td></tr>
+<tr><td><code>app_settings</code></td><td>Configuracion dinamica.</td></tr>
+</tbody></table>
+<h2>11. Estados Operativos</h2>
+<h3>Pedidos</h3>
+<table>
+<thead><tr><th>Estado</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><code>pending_review</code></td><td>Pendiente de moderacion.</td></tr>
+<tr><td><code>open</code></td><td>Disponible para postulaciones.</td></tr>
+<tr><td><code>assigned</code></td><td>Tecnico asignado.</td></tr>
+<tr><td><code>in_progress</code></td><td>Servicio en ejecucion.</td></tr>
+<tr><td><code>completed</code></td><td>Servicio terminado.</td></tr>
+<tr><td><code>cancelled</code></td><td>Cancelado.</td></tr>
+<tr><td><code>expired</code></td><td>Vencido.</td></tr>
+<tr><td><code>rejected</code></td><td>Rechazado por moderacion.</td></tr>
+</tbody></table>
+<h3>Postulaciones</h3>
+<table>
+<thead><tr><th>Estado</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><code>pending</code></td><td>Postulacion activa.</td></tr>
+<tr><td><code>accepted</code></td><td>Elegida por cliente.</td></tr>
+<tr><td><code>rejected</code></td><td>Rechazada.</td></tr>
+<tr><td><code>withdrawn</code></td><td>Retirada por tecnico.</td></tr>
+</tbody></table>
+<h3>Tecnicos</h3>
+<table>
+<thead><tr><th>Estado</th><th>Significado</th></tr></thead>
+<tbody>
+<tr><td><code>pending</code></td><td>En revision.</td></tr>
+<tr><td><code>verified</code></td><td>Aprobado.</td></tr>
+<tr><td><code>rejected</code></td><td>Rechazado.</td></tr>
+<tr><td><code>suspended</code></td><td>Suspendido.</td></tr>
+</tbody></table>
+<h2>12. Pagos Y Monetizacion</h2>
+<p>TOKE+ monetiza por:</p>
+<ul>
+<li>Paquetes de creditos para postulaciones.</li>
+<li>Planes TokePro para tecnicos.</li>
+</ul>
+<p>Mercado Pago esta configurado en produccion:</p>
+<ul>
+<li>Heroku: <code>MERCADOPAGO_USE_SANDBOX=false</code>.</li>
+<li>InsForge <code>app_settings</code>: <code>mercadopago_sandbox=false</code>.</li>
+</ul>
+<p>Flujo:</p>
+<pre><code>Tecnico selecciona paquete/plan
+-&gt; App llama backend Express
+-&gt; Backend crea orden Mercado Pago
+-&gt; Usuario paga
+-&gt; Mercado Pago llama webhook
+-&gt; Backend valida y ejecuta RPC
+-&gt; Wallet/subscription se actualiza</code></pre>
+<h2>13. IA</h2>
+<p>IA se usa para:</p>
+<ul>
+<li>Sugerir categoria de pedido.</li>
+<li>Responder soporte.</li>
+<li>Moderar pedidos.</li>
+<li>Analizar documentos.</li>
+</ul>
+<p>Superficies:</p>
+<ul>
+<li>App movil: <code>/functions/ai-gateway</code> en InsForge.</li>
+<li>Backend: <code>/api/ai/*</code> en Express.</li>
+</ul>
+<h2>14. Seguridad</h2>
+<ul>
+<li>JWT y sesiones InsForge.</li>
+<li>Verificacion de email obligatoria por codigo.</li>
+<li>Buckets privados para documentos de verificacion.</li>
+<li>Admin protegido por rol y cookies seguras.</li>
+<li>Auditoria de acciones administrativas.</li>
+<li>CORS y trusted origin en backend.</li>
+<li>Rate limits para pagos e IA.</li>
+<li>Secretos fuera del repo.</li>
+</ul>
+<h2>15. Pruebas Realizadas</h2>
+<h3>Mobile</h3>
+<ul>
+<li><code>flutter analyze</code>: OK.</li>
+<li><code>flutter test</code>: OK.</li>
+<li>Build profile generado previamente en dispositivo Android cuando estuvo conectado.</li>
+</ul>
+<h3>Backend</h3>
+<ul>
+<li><code>npm run build</code>: OK.</li>
+<li><code>npm test</code>: 26 tests OK.</li>
+<li>Produccion <code>/health</code>: 200.</li>
+<li>Produccion <code>/api/ai/suggest-category</code>: 200.</li>
+<li>Mercado Pago return: 302 a deep link mobile.</li>
+</ul>
+<h3>Web</h3>
+<ul>
+<li><code>npm run lint</code>: OK.</li>
+<li><code>npm run build</code>: OK.</li>
+<li>Landing en Vercel: 200.</li>
+</ul>
+<h3>InsForge</h3>
+<ul>
+<li><code>get_public_requests</code>: 200, devuelve detalle publico.</li>
+<li><code>get_all_providers</code>: 200, devuelve tecnicos verificados.</li>
+<li><code>get_technician_reviews</code>: 200, devuelve resenas reales.</li>
+<li><code>ai-gateway</code>: 200, responde soporte IA.</li>
+<li>Registro real QA: token de verificacion creado y correo enviado via SMTP.</li>
+</ul>
+<h2>16. URLs Operativas</h2>
+<table>
+<thead><tr><th>Servicio</th><th>URL</th></tr></thead>
+<tbody>
+<tr><td>Web principal</td><td><code>https://tokeplus.app</code></td></tr>
+<tr><td>Web Vercel</td><td><code>https://tokeweb.vercel.app</code></td></tr>
+<tr><td>Backend Heroku</td><td><code>https://tokeplus-api-439t8drp-fdd3e7290e72.herokuapp.com</code></td></tr>
+<tr><td>InsForge</td><td><code>https://439t8drp.us-east.insforge.app</code></td></tr>
+</tbody></table>
+<h2>17. Despliegue</h2>
+<h3>Mobile</h3>
+<p>GitHub Actions genera APK y crea <code>google-services.json</code> desde secret. Antes de publicar:</p>
+<pre><code>flutter analyze
+flutter test
+flutter build apk --release</code></pre>
+<h3>Web</h3>
+<p>Vercel despliega Next.js. Antes de desplegar:</p>
+<pre><code>npm run lint
+npm run build</code></pre>
+<h3>Backend</h3>
+<p>Heroku ejecuta build TypeScript y arranca <code>dist/index.js</code>. Antes de desplegar:</p>
+<pre><code>npm run build
+npm test</code></pre>
+<h2>18. Riesgos Y Pendientes</h2>
+<ul>
+<li>Rotar/restringir Google API key reportada por GitHub Secret Scanning.</li>
+<li>Reinstalar build profile final en dispositivo cuando vuelva a conectarse.</li>
+<li>Mantener migraciones SQL versionadas junto con despliegues.</li>
+<li>Revisar periodicamente logs de Mercado Pago y SMTP.</li>
+</ul>
+<h2>19. Checklist Operativo</h2>
+<ul>
+<li>Ejecutar tests mobile/web/backend.</li>
+<li>Verificar <code>/health</code> de Heroku.</li>
+<li>Verificar InsForge metadata y logs.</li>
+<li>Validar correo de verificacion en logs SMTP.</li>
+<li>Confirmar aliases Vercel.</li>
+<li>Confirmar GitHub Actions mobile.</li>
+<li>Revisar Secret Scanning antes de release publico.</li>
+</ul>
+<h2>20. Resumen Final</h2>
+<p>TOKE+ queda documentado como una plataforma full-stack operativa: app movil para clientes y tecnicos, web publica y administrativa, backend seguro para integraciones externas, InsForge como nucleo de datos/auth/storage/IA, Mercado Pago en produccion y pruebas de endpoints/correos verificadas.</p></main>
+  <div class="watermark">TOKE+ | Documentacion Integral</div>
+</body>
+</html>
