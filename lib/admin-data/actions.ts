@@ -797,3 +797,65 @@ export async function removeAdminAccess(userId: string) {
   revalidatePath('/gestion-x7k2m9/configuracion')
   return { success: true }
 }
+
+// ─── Chat Moderation ─────────────────────────────────────────────────────────
+
+export async function deleteMessage(messageId: string) {
+  if (!messageId) return { success: false, message: 'Mensaje inválido.' }
+
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, message: 'Sesión admin inválida.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('messages')
+    .delete()
+    .eq('id', messageId)
+
+  if (error) return { success: false, message: error.message }
+
+  await logAdminAction('delete_message', 'message', messageId)
+  return { success: true }
+}
+
+export async function flagConversation(conversationId: string, reason: string) {
+  if (!conversationId) return { success: false, message: 'Conversación inválida.' }
+
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, message: 'Sesión admin inválida.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('flagged_conversations')
+    .upsert([{
+      conversation_id: conversationId,
+      flagged_by: admin.id,
+      reason: reason || 'Contenido inapropiado',
+      flagged_at: new Date().toISOString(),
+    }], { onConflict: 'conversation_id' })
+
+  if (error) return { success: false, message: error.message }
+
+  await logAdminAction('flag_conversation', 'conversation', conversationId, { reason })
+  revalidatePath('/gestion-x7k2m9/mensajes')
+  return { success: true }
+}
+
+export async function unflagConversation(conversationId: string) {
+  if (!conversationId) return { success: false, message: 'Conversación inválida.' }
+
+  const admin = await getAdminSession()
+  if (!admin) return { success: false, message: 'Sesión admin inválida.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('flagged_conversations')
+    .delete()
+    .eq('conversation_id', conversationId)
+
+  if (error) return { success: false, message: error.message }
+
+  await logAdminAction('unflag_conversation', 'conversation', conversationId)
+  revalidatePath('/gestion-x7k2m9/mensajes')
+  return { success: true }
+}
