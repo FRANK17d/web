@@ -12,6 +12,24 @@ async function getAuthenticatedClient() {
   return createInsforgeServerClient(accessToken)
 }
 
+/** Registra una accion admin en la tabla audit_log (fire-and-forget). */
+async function logAdminAction(action: string, targetType?: string, targetId?: string, details?: Record<string, unknown>) {
+  try {
+    const admin = await getAdminSession()
+    if (!admin) return
+    const client = await getAuthenticatedClient()
+    await client.database.from('admin_audit_log').insert([{
+      admin_id: admin.id,
+      action,
+      target_type: targetType ?? null,
+      target_id: targetId ?? null,
+      details: details ?? {},
+    }])
+  } catch {
+    // fire-and-forget: no romper la accion principal
+  }
+}
+
 type AdminRpcResult = {
   success?: boolean
   message?: string
@@ -147,7 +165,8 @@ export async function toggleUserActive(userId: string, active: boolean) {
     .eq('id', userId)
 
   if (error) return { success: false, message: error.message }
-  revalidatePath('/gestion-x7k2m9/configuracion')
+  logAdminAction(active ? 'user_activate' : 'user_deactivate', 'user', userId)
+  revalidatePath('/gestion-x7k2m9')
   return { success: true }
 }
 
@@ -728,6 +747,7 @@ export async function promoteToAdmin(userId: string, level: 'superadmin' | 'admi
     .eq('id', userId)
 
   if (error) return { success: false, message: error.message }
+  logAdminAction('promote_to_admin', 'user', userId, { level })
   revalidatePath('/gestion-x7k2m9/configuracion')
   return { success: true }
 }

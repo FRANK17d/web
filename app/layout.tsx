@@ -15,6 +15,7 @@ export const metadata: Metadata = {
   authors: [{ name: 'toke+' }],
   creator: 'toke+',
   publisher: 'toke+',
+  manifest: '/manifest.json',
   openGraph: {
     title: 'toke+ — Servicios para el hogar en Perú',
     description: 'Técnicos verificados para tu hogar, al instante.',
@@ -36,6 +37,7 @@ export const metadata: Metadata = {
     title: 'toke+ — Servicios para el hogar en Perú',
     description: 'Técnicos verificados para tu hogar, al instante.',
     images: ['/og-whatsapp.jpg'],
+    site: '@tokeplus_app',
   },
   robots: {
     index: true,
