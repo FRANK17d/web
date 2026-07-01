@@ -5,8 +5,7 @@
       "namespace": "android_app",
       "package_name": "com.tokeplus.app",
       "sha256_cert_fingerprints": [
-        "TODO:REPLACE_WITH_RELEASE_KEY_SHA256",
-        "TODO:REPLACE_WITH_DEBUG_KEY_SHA256"
+        "DB:CF:0B:47:1F:D8:A7:5B:5A:AD:12:25:E6:93:99:7E:24:42:CD:4F:66:64:9C:5A:39:9C:77:A1:60:EB:87:58"
       ]
     }
   }
