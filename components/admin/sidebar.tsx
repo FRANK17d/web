@@ -16,6 +16,8 @@ import {
   Settings,
   Star,
   Receipt,
+  MapPin,
+  MessageSquare,
   X,
 } from 'lucide-react'
 import { AdminLogoutButton } from '@/components/admin/logout-button'
@@ -33,6 +35,8 @@ const navItems = [
   { href: '/gestion-x7k2m9/disputas', label: 'Soporte', icon: AlertTriangle },
   { href: '/gestion-x7k2m9/reportes', label: 'Reportes', icon: BarChart3 },
   { href: '/gestion-x7k2m9/configuracion', label: 'Configuración', icon: Settings },
+  { href: '/gestion-x7k2m9/distritos', label: 'Distritos', icon: MapPin },
+  { href: '/gestion-x7k2m9/mensajes', label: 'Mensajes', icon: MessageSquare },
 ]
 
 export function AdminSidebar({

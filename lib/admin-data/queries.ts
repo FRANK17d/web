@@ -1057,6 +1057,219 @@ export async function getTechnicianDetail(userId: string): Promise<TechnicianPro
   }
 }
 
+// ─── Districts ────────────────────────────────────────────────
+
+export type DistrictRow = {
+  id: number
+  name: string
+  province: string | null
+  department: string | null
+  latitude: number | null
+  longitude: number | null
+  is_active: boolean
+  created_at: string
+}
+
+export async function getDistricts() {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('districts')
+    .select('id, name, province, department, latitude, longitude, is_active, created_at')
+    .order('name', { ascending: true })
+
+  if (error) return []
+  return (data ?? []) as DistrictRow[]
+}
+
+// ─── Conversations (Chat Moderation) ─────────────────────────
+
+export type ConversationRow = {
+  id: string
+  participant_1_name: string
+  participant_2_name: string
+  last_message_preview: string | null
+  message_count: number
+  created_at: string
+}
+
+export async function getConversations(): Promise<ConversationRow[]> {
+  const client = await getAuthenticatedClient()
+
+  const { data, error } = await client.database
+    .from('conversations')
+    .select('id, participant_1, participant_2, last_message, message_count, created_at')
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (error || !data) return []
+
+  type ConversationQueryRow = {
+    id: string
+    participant_1: string
+    participant_2: string
+    last_message: string | null
+    message_count: number
+    created_at: string
+  }
+
+  const rows = data as ConversationQueryRow[]
+  const participantIds = Array.from(
+    new Set(rows.flatMap((r) => [r.participant_1, r.participant_2]).filter(Boolean))
+  )
+
+  const profilesById = new Map<string, { first_name: string | null; last_name: string | null }>()
+
+  if (participantIds.length > 0) {
+    const { data: profiles } = await client.database
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .in('id', participantIds)
+
+    for (const p of (profiles ?? []) as { id: string; first_name: string | null; last_name: string | null }[]) {
+      profilesById.set(p.id, p)
+    }
+  }
+
+  return rows.map((r) => {
+    const p1 = profilesById.get(r.participant_1)
+    const p2 = profilesById.get(r.participant_2)
+    return {
+      id: r.id,
+      participant_1_name: [p1?.first_name, p1?.last_name].filter(Boolean).join(' ') || 'Usuario',
+      participant_2_name: [p2?.first_name, p2?.last_name].filter(Boolean).join(' ') || 'Usuario',
+      last_message_preview: r.last_message,
+      message_count: r.message_count ?? 0,
+      created_at: r.created_at,
+    }
+  })
+}
+
+export type ConversationMessageRow = {
+  id: string
+  conversation_id: string
+  sender_id: string
+  sender_name: string
+  body: string
+  created_at: string
+}
+
+export async function getConversationMessages(conversationId: string): Promise<ConversationMessageRow[]> {
+  const client = await getAuthenticatedClient()
+
+  const { data, error } = await client.database
+    .from('messages')
+    .select('id, conversation_id, sender_id, body, created_at')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true })
+
+  if (error || !data) return []
+
+  type MessageQueryRow = {
+    id: string
+    conversation_id: string
+    sender_id: string
+    body: string
+    created_at: string
+  }
+
+  const rows = data as MessageQueryRow[]
+  const senderIds = Array.from(new Set(rows.map((r) => r.sender_id).filter(Boolean)))
+  const profilesById = new Map<string, { first_name: string | null; last_name: string | null }>()
+
+  if (senderIds.length > 0) {
+    const { data: profiles } = await client.database
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .in('id', senderIds)
+
+    for (const p of (profiles ?? []) as { id: string; first_name: string | null; last_name: string | null }[]) {
+      profilesById.set(p.id, p)
+    }
+  }
+
+  return rows.map((r) => {
+    const profile = profilesById.get(r.sender_id)
+    return {
+      id: r.id,
+      conversation_id: r.conversation_id,
+      sender_id: r.sender_id,
+      sender_name: [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') || 'Usuario',
+      body: r.body,
+      created_at: r.created_at,
+    }
+  })
+}
+
+// ─── Reports / Analytics ──────────────────────────────────────
+
+export type MonthlyCount = {
+  month: string // "2024-01"
+  label: string // "Ene"
+  count: number
+}
+
+export type MonthlyRevenue = {
+  month: string
+  label: string
+  amount: number
+}
+
+const MONTH_LABELS = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+
+function getLast6Months(): { month: string; label: string }[] {
+  const months: { month: string; label: string }[] = []
+  const now = new Date()
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+    months.push({ month: key, label: MONTH_LABELS[d.getMonth()] })
+  }
+  return months
+}
+
+export async function getOrdersByMonth(): Promise<MonthlyCount[]> {
+  const client = await getAuthenticatedClient()
+  const months = getLast6Months()
+  const startDate = `${months[0].month}-01`
+
+  const { data, error } = await client.database
+    .from('service_requests')
+    .select('created_at')
+    .gte('created_at', startDate)
+
+  if (error || !data) return months.map((m) => ({ ...m, count: 0 }))
+
+  const countByMonth = new Map<string, number>()
+  for (const row of data as { created_at: string }[]) {
+    const key = row.created_at.slice(0, 7)
+    countByMonth.set(key, (countByMonth.get(key) ?? 0) + 1)
+  }
+
+  return months.map((m) => ({ ...m, count: countByMonth.get(m.month) ?? 0 }))
+}
+
+export async function getRevenueByMonth(): Promise<MonthlyRevenue[]> {
+  const client = await getAuthenticatedClient()
+  const months = getLast6Months()
+  const startDate = `${months[0].month}-01`
+
+  const { data, error } = await client.database
+    .from('payment_orders')
+    .select('amount_pen, created_at')
+    .eq('status', 'approved')
+    .gte('created_at', startDate)
+
+  if (error || !data) return months.map((m) => ({ ...m, amount: 0 }))
+
+  const amountByMonth = new Map<string, number>()
+  for (const row of data as { amount_pen: number; created_at: string }[]) {
+    const key = row.created_at.slice(0, 7)
+    amountByMonth.set(key, (amountByMonth.get(key) ?? 0) + row.amount_pen)
+  }
+
+  return months.map((m) => ({ ...m, amount: amountByMonth.get(m.month) ?? 0 }))
+}
+
 export async function getUserRecentOrders(userId: string): Promise<UserRecentOrder[]> {
   const client = await getAuthenticatedClient()
 
@@ -1086,4 +1299,30 @@ export async function getUserRecentOrders(userId: string): Promise<UserRecentOrd
 
   orders.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
   return orders.slice(0, 15)
+}
+
+// ─── Admin Users Management ───────────────────────────────────
+
+export type AdminLevel = 'superadmin' | 'admin' | 'moderator'
+
+export type AdminUserRow = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  email: string | null
+  admin_level: AdminLevel | null
+  is_active: boolean
+  created_at: string
+}
+
+export async function getAdminUsers(): Promise<AdminUserRow[]> {
+  const client = await getAuthenticatedClient()
+  const { data, error } = await client.database
+    .from('profiles')
+    .select('id, first_name, last_name, email, admin_level, is_active, created_at')
+    .eq('role', 'admin')
+    .order('created_at', { ascending: true })
+
+  if (error) return []
+  return (data ?? []) as AdminUserRow[]
 }

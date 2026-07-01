@@ -147,8 +147,79 @@ export async function toggleUserActive(userId: string, active: boolean) {
     .eq('id', userId)
 
   if (error) return { success: false, message: error.message }
-  revalidatePath('/gestion-x7k2m9')
+  revalidatePath('/gestion-x7k2m9/configuracion')
   return { success: true }
+}
+
+// ─── Integration Settings ─────────────────────────────────────
+
+export async function updateIntegrationSettings(formData: FormData) {
+  const client = await getAuthenticatedClient()
+
+  const integrations = {
+    mercadopago_sandbox: formString(formData, 'mercadopagoSandbox') === 'true',
+    commission_rate: formNumber(formData, 'commissionRate') ?? 0,
+    max_photos_per_request: formInt(formData, 'maxPhotosPerRequest') ?? 5,
+    auto_approve_requests: formString(formData, 'autoApproveRequests') === 'true',
+  }
+
+  const { error } = await client.database
+    .from('app_settings')
+    .update({ value: integrations })
+    .eq('key', 'integrations')
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/configuracion')
+  return { success: true }
+}
+
+// ─── Image Upload (Storage) ───────────────────────────────────
+
+export async function uploadBrandingImage(formData: FormData) {
+  const file = formData.get('file') as File | null
+  const imageType = formString(formData, 'imageType') // 'logo' | 'hero'
+
+  if (!file || file.size === 0) return { success: false, message: 'Selecciona un archivo.' }
+  if (file.size > 5 * 1024 * 1024) return { success: false, message: 'Máximo 5 MB.' }
+  if (!file.type.startsWith('image/')) return { success: false, message: 'Solo se permiten imágenes.' }
+
+  const ext = file.name.split('.').pop() || 'webp'
+  const path = `${imageType}-${Date.now()}.${ext}`
+
+  const client = await getAuthenticatedClient()
+
+  const { error: uploadError } = await client.storage
+    .from('branding')
+    .upload(path, file)
+
+  if (uploadError) return { success: false, message: uploadError.message }
+
+  const publicUrl = client.storage.from('branding').getPublicUrl(path)
+  if (!publicUrl) return { success: false, message: 'No se pudo obtener la URL publica.' }
+
+  // Update the app_settings branding entry with the new URL
+  const fieldKey = imageType === 'logo' ? 'logo_url' : 'hero_image_url'
+
+  // First get current branding value
+  const { data: currentData } = await client.database
+    .from('app_settings')
+    .select('value')
+    .eq('key', 'branding')
+    .maybeSingle()
+
+  const currentBranding = (currentData?.value as Record<string, unknown>) ?? {}
+  const updatedBranding = { ...currentBranding, [fieldKey]: publicUrl }
+
+  const { error: updateError } = await client.database
+    .from('app_settings')
+    .update({ value: updatedBranding })
+    .eq('key', 'branding')
+
+  if (updateError) return { success: false, message: updateError.message }
+
+  revalidatePath('/gestion-x7k2m9/configuracion')
+  revalidatePath('/')
+  return { success: true, url: publicUrl }
 }
 
 export async function updateSupportTicketStatus(
@@ -480,6 +551,87 @@ export async function updateLandingSettings(formData: FormData) {
   revalidatePath('/gestion-x7k2m9/configuracion')
 }
 
+// ─── Distritos ────────────────────────────────────────────────
+
+export async function createDistrict(formData: FormData) {
+  const name = formString(formData, 'name')
+  const province = formString(formData, 'province')
+  const department = formString(formData, 'department')
+  const latitude = formNumber(formData, 'latitude')
+  const longitude = formNumber(formData, 'longitude')
+
+  if (!name) return { success: false, message: 'Ingresa un nombre para el distrito.' }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database.from('districts').insert([
+    {
+      name,
+      province: province || null,
+      department: department || null,
+      latitude,
+      longitude,
+      is_active: true,
+    },
+  ])
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/distritos')
+  return { success: true }
+}
+
+export async function updateDistrict(formData: FormData) {
+  const id = formInt(formData, 'id')
+  if (id === null) return { success: false, message: 'Distrito inválido.' }
+
+  const name = formString(formData, 'name')
+  if (!name) return { success: false, message: 'Ingresa un nombre válido.' }
+
+  const province = formString(formData, 'province')
+  const department = formString(formData, 'department')
+  const latitude = formNumber(formData, 'latitude')
+  const longitude = formNumber(formData, 'longitude')
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('districts')
+    .update({
+      name,
+      province: province || null,
+      department: department || null,
+      latitude,
+      longitude,
+    })
+    .eq('id', id)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/distritos')
+  return { success: true }
+}
+
+export async function deleteDistrict(districtId: number) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('districts')
+    .delete()
+    .eq('id', districtId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/distritos')
+  return { success: true }
+}
+
+export async function toggleDistrict(districtId: number, active: boolean) {
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('districts')
+    .update({ is_active: active })
+    .eq('id', districtId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/distritos')
+  return { success: true }
+}
+
 // ─── Ajuste manual de créditos ────────────────────────────────
 
 export async function adjustCredits(formData: FormData) {
@@ -556,5 +708,72 @@ export async function assignTechnicianToRequest(requestId: string, technicianId:
   revalidatePath(`/gestion-x7k2m9/reservas/${requestId}`)
   revalidatePath('/gestion-x7k2m9/reservas')
   revalidatePath('/gestion-x7k2m9')
+  return { success: true }
+}
+
+// ─── Admin Users Management ──────────────────────────────────
+
+export async function promoteToAdmin(userId: string, level: 'superadmin' | 'admin' | 'moderator') {
+  if (!userId) return { success: false, message: 'Usuario inválido.' }
+
+  const admin = await getAdminSession()
+  if (!admin || admin.adminLevel !== 'superadmin') {
+    return { success: false, message: 'Solo superadmins pueden gestionar administradores.' }
+  }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('profiles')
+    .update({ role: 'admin', admin_level: level })
+    .eq('id', userId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/configuracion')
+  return { success: true }
+}
+
+export async function setAdminLevel(userId: string, level: 'superadmin' | 'admin' | 'moderator') {
+  if (!userId) return { success: false, message: 'Usuario inválido.' }
+
+  const admin = await getAdminSession()
+  if (!admin || admin.adminLevel !== 'superadmin') {
+    return { success: false, message: 'Solo superadmins pueden cambiar niveles.' }
+  }
+
+  if (userId === admin.id) {
+    return { success: false, message: 'No puedes cambiar tu propio nivel.' }
+  }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('profiles')
+    .update({ admin_level: level })
+    .eq('id', userId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/configuracion')
+  return { success: true }
+}
+
+export async function removeAdminAccess(userId: string) {
+  if (!userId) return { success: false, message: 'Usuario inválido.' }
+
+  const admin = await getAdminSession()
+  if (!admin || admin.adminLevel !== 'superadmin') {
+    return { success: false, message: 'Solo superadmins pueden revocar acceso.' }
+  }
+
+  if (userId === admin.id) {
+    return { success: false, message: 'No puedes revocarte a ti mismo.' }
+  }
+
+  const client = await getAuthenticatedClient()
+  const { error } = await client.database
+    .from('profiles')
+    .update({ role: 'client', admin_level: null })
+    .eq('id', userId)
+
+  if (error) return { success: false, message: error.message }
+  revalidatePath('/gestion-x7k2m9/configuracion')
   return { success: true }
 }

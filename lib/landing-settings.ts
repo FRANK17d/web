@@ -78,3 +78,40 @@ export const getLandingSettings = cache(async (): Promise<LandingSettings> => {
     iosUrl: stringValue(storeLinks.ios, DEFAULT_SETTINGS.iosUrl),
   }
 })
+
+// ─── Integration Settings ─────────────────────────────────────
+
+export type IntegrationSettings = {
+  mercadopagoSandbox: boolean
+  commissionRate: number
+  maxPhotosPerRequest: number
+  autoApproveRequests: boolean
+}
+
+const DEFAULT_INTEGRATIONS: IntegrationSettings = {
+  mercadopagoSandbox: true,
+  commissionRate: 0,
+  maxPhotosPerRequest: 5,
+  autoApproveRequests: false,
+}
+
+export const getIntegrationSettings = cache(async (): Promise<IntegrationSettings> => {
+  const client = createInsforgeServerClient()
+  const { data, error } = await client.database
+    .from('app_settings')
+    .select('key, value')
+    .eq('key', 'integrations')
+    .maybeSingle()
+
+  if (error || !data) return DEFAULT_INTEGRATIONS
+
+  const row = data as AppSettingRow
+  const v = asRecord(row.value)
+
+  return {
+    mercadopagoSandbox: typeof v.mercadopago_sandbox === 'boolean' ? v.mercadopago_sandbox : DEFAULT_INTEGRATIONS.mercadopagoSandbox,
+    commissionRate: typeof v.commission_rate === 'number' ? v.commission_rate : DEFAULT_INTEGRATIONS.commissionRate,
+    maxPhotosPerRequest: typeof v.max_photos_per_request === 'number' ? v.max_photos_per_request : DEFAULT_INTEGRATIONS.maxPhotosPerRequest,
+    autoApproveRequests: typeof v.auto_approve_requests === 'boolean' ? v.auto_approve_requests : DEFAULT_INTEGRATIONS.autoApproveRequests,
+  }
+})

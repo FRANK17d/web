@@ -11,7 +11,10 @@ type ProfileRow = {
   last_name: string | null
   email: string | null
   is_active: boolean
+  admin_level: 'superadmin' | 'admin' | 'moderator' | null
 }
+
+export type AdminLevel = 'superadmin' | 'admin' | 'moderator'
 
 export type AdminSessionUser = {
   id: string
@@ -21,11 +24,12 @@ export type AdminSessionUser = {
   apellidos: string
   nombreCompleto: string
   rol: 'admin'
+  adminLevel: AdminLevel
   activo: boolean
   ultimoIngreso: string | null
 }
 
-const PROFILE_COLUMNS = ['id', 'role', 'first_name', 'last_name', 'email', 'is_active'].join(', ')
+const PROFILE_COLUMNS = ['id', 'role', 'first_name', 'last_name', 'email', 'is_active', 'admin_level'].join(', ')
 
 function isEligibleAdmin(row: ProfileRow | null): row is ProfileRow {
   return !!row && row.role === 'admin' && row.is_active === true
@@ -71,6 +75,7 @@ export function buildAdminUser(row: ProfileRow): AdminSessionUser {
     apellidos,
     nombreCompleto,
     rol: 'admin',
+    adminLevel: row.admin_level ?? 'superadmin',
     activo: row.is_active,
     ultimoIngreso: null,
   }
